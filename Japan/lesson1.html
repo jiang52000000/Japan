@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>标准日语 初级上册 - 第一课</title>
+    <title>标准日语 初级上册 - 第一课V2</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Sans+SC&display=swap" rel="stylesheet">
     <style>
@@ -17,12 +17,17 @@
             cursor: pointer;
             font-size: 12px;
             vertical-align: middle;
+            min-width: 30px;
         }
         .audio-button:hover {
             background: #005c99;
         }
         .audio-button:active {
             background: #004d80;
+        }
+        .audio-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         .speech-controls {
             margin-top: 5px;
@@ -35,6 +40,33 @@
         .speed-control select {
             font-size: 11px;
             padding: 2px;
+        }
+        .audio-status {
+            font-size: 10px;
+            color: #888;
+            margin-left: 5px;
+        }
+        .audio-fallback {
+            background: #28a745;
+            margin-left: 5px;
+        }
+        .audio-fallback:hover {
+            background: #218838;
+        }
+        .pronounce-hint {
+            font-size: 10px;
+            color: #666;
+            font-style: italic;
+            margin-left: 10px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .audio-playing {
+            animation: pulse 1s infinite;
+            background: #dc3545 !important;
         }
     </style>
 </head>
@@ -592,99 +624,307 @@
     
     <script src="script.js"></script>
     <script>
-        // 日语音频播放功能
-        let speechSynthesis = window.speechSynthesis;
+        // 音频播放状态管理
+        let audioContext = null;
+        let currentAudio = null;
+        let speechSupported = false;
         let japaneseVoice = null;
+        
+        // 检测音频支持
+        function checkAudioSupport() {
+            // 检查Web Speech API支持
+            if ('speechSynthesis' in window) {
+                speechSupported = true;
+                console.log('✓ Web Speech API 支持');
+            } else {
+                console.log('✗ Web Speech API 不支持');
+            }
+            
+            // 检查Web Audio API支持
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                console.log('✓ Web Audio API 支持');
+            } catch(e) {
+                console.log('✗ Web Audio API 不支持');
+            }
+            
+            return speechSupported;
+        }
         
         // 初始化日语语音
         function initJapaneseVoice() {
+            if (!speechSupported) return;
+            
             const voices = speechSynthesis.getVoices();
-            // 寻找日语语音
-            japaneseVoice = voices.find(voice => 
-                voice.lang.includes('ja') || 
-                voice.name.includes('Japanese') ||
-                voice.name.includes('日本') ||
-                voice.name.includes('Kyoko') ||
-                voice.name.includes('Otoya')
+            console.log('可用语音数量:', voices.length);
+            
+            // 优先查找日语语音
+            const japaneseVoices = voices.filter(voice => 
+                voice.lang && (
+                    voice.lang.toLowerCase().includes('ja') ||
+                    voice.lang.toLowerCase().includes('jp')
+                )
             );
             
-            // 如果没有找到日语语音，使用默认语音
-            if (!japaneseVoice) {
-                japaneseVoice = voices[0];
-                console.log('未找到日语语音，使用默认语音');
+            if (japaneseVoices.length > 0) {
+                japaneseVoice = japaneseVoices[0];
+                console.log('✓ 找到日语语音:', japaneseVoice.name, japaneseVoice.lang);
             } else {
-                console.log('使用日语语音:', japaneseVoice.name);
-            }
-        }
-        
-        // 播放日语音频
-        function playJapanese(text) {
-            // 停止当前播放
-            speechSynthesis.cancel();
-            
-            if (!japaneseVoice) {
-                initJapaneseVoice();
-            }
-            
-            const utterance = new SpeechSynthesisUtterance(text);
-            
-            // 设置语音参数
-            if (japaneseVoice) {
-                utterance.voice = japaneseVoice;
-            }
-            utterance.lang = 'ja-JP';
-            utterance.rate = parseFloat(document.getElementById('speechRate')?.value || 0.9);
-            utterance.pitch = 1.0;
-            utterance.volume = 1.0;
-            
-            // 错误处理
-            utterance.onerror = function(event) {
-                console.error('语音播放错误:', event.error);
-                // 尝试备用方案
-                if (event.error === 'not-allowed' || event.error === 'network') {
-                    alert('音频播放被阻止，请检查浏览器设置或网络连接');
+                // 查找包含日语关键词的语音
+                japaneseVoice = voices.find(voice => 
+                    voice.name && (
+                        voice.name.toLowerCase().includes('japanese') ||
+                        voice.name.toLowerCase().includes('kyoko') ||
+                        voice.name.toLowerCase().includes('otoya') ||
+                        voice.name.toLowerCase().includes('haruka')
+                    )
+                );
+                
+                if (japaneseVoice) {
+                    console.log('✓ 找到日语相关语音:', japaneseVoice.name);
+                } else {
+                    console.log('⚠ 未找到专门的日语语音，将使用默认语音');
+                    japaneseVoice = voices[0];
                 }
-            };
+            }
             
-            utterance.onstart = function() {
-                console.log('开始播放:', text);
-            };
+            // 更新页面状态显示
+            updateAudioStatus();
+        }
+        
+        // 更新音频状态显示
+        function updateAudioStatus() {
+            const statusElements = document.querySelectorAll('.audio-status');
+            const status = japaneseVoice ? 
+                `语音: ${japaneseVoice.name.substring(0, 20)}` : 
+                '语音: 不可用';
             
-            utterance.onend = function() {
-                console.log('播放结束:', text);
-            };
+            statusElements.forEach(el => {
+                el.textContent = status;
+            });
+        }
+        
+        // 主要播放函数
+        function playJapanese(text, button) {
+            console.log('尝试播放:', text);
             
-            // 播放
+            // 停止当前播放
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            
+            // 重置按钮状态
+            const allButtons = document.querySelectorAll('.audio-button');
+            allButtons.forEach(btn => {
+                btn.classList.remove('audio-playing');
+                btn.disabled = false;
+                btn.textContent = '🔊';
+            });
+            
+            if (!speechSupported) {
+                showFallbackOption(text, button);
+                return;
+            }
+            
+            // 设置按钮状态
+            if (button) {
+                button.classList.add('audio-playing');
+                button.disabled = true;
+                button.textContent = '⏸';
+            }
+            
             try {
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // 设置语音参数
+                if (japaneseVoice) {
+                    utterance.voice = japaneseVoice;
+                }
+                utterance.lang = 'ja-JP';
+                utterance.rate = parseFloat(document.getElementById('speechRate')?.value || 0.8);
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                // 事件处理
+                utterance.onstart = function() {
+                    console.log('▶ 开始播放:', text);
+                };
+                
+                utterance.onend = function() {
+                    console.log('⏹ 播放结束:', text);
+                    if (button) {
+                        button.classList.remove('audio-playing');
+                        button.disabled = false;
+                        button.textContent = '🔊';
+                    }
+                };
+                
+                utterance.onerror = function(event) {
+                    console.error('❌ 播放错误:', event.error);
+                    if (button) {
+                        button.classList.remove('audio-playing');
+                        button.disabled = false;
+                        button.textContent = '🔊';
+                    }
+                    
+                    // 根据错误类型提供不同的处理
+                    if (event.error === 'not-allowed') {
+                        alert('🔒 音频播放被浏览器阻止。\n\n解决方法：\n1. 刷新页面后重试\n2. 检查浏览器音频权限设置\n3. 尝试手动点击页面任意位置后再播放');
+                    } else if (event.error === 'network') {
+                        showFallbackOption(text, button);
+                    } else {
+                        showFallbackOption(text, button);
+                    }
+                };
+                
+                // 执行播放
                 speechSynthesis.speak(utterance);
+                
             } catch (error) {
-                console.error('播放失败:', error);
-                alert('音频播放失败，请尝试刷新页面或使用其他浏览器');
+                console.error('❌ 播放异常:', error);
+                if (button) {
+                    button.classList.remove('audio-playing');
+                    button.disabled = false;
+                    button.textContent = '🔊';
+                }
+                showFallbackOption(text, button);
             }
         }
         
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 等待语音API加载
-            if (speechSynthesis.getVoices().length === 0) {
-                speechSynthesis.addEventListener('voiceschanged', initJapaneseVoice);
-            } else {
-                initJapaneseVoice();
+        // 备用方案：显示发音提示
+        function showFallbackOption(text, button) {
+            // 简单的罗马音转换（基础版）
+            const romajiMap = {
+                'すみません': 'su-mi-ma-sen',
+                'はじめまして': 'ha-ji-me-ma-shi-te',
+                'ありがとうございます': 'a-ri-ga-to-u go-za-i-ma-su',
+                'はい': 'hai',
+                'どうぞ': 'do-u-zo',
+                'です': 'de-su',
+                'よろしく': 'yo-ro-shi-ku',
+                'お願いします': 'o-ne-ga-i-shi-ma-su',
+                '中国': 'chu-u-go-ku',
+                '日本語': 'ni-ho-n-go',
+                '勉強しています': 'be-n-kyo-u shi-te i-ma-su'
+            };
+            
+            const romaji = romajiMap[text] || text;
+            
+            // 创建发音提示
+            const hint = document.createElement('span');
+            hint.className = 'pronounce-hint';
+            hint.textContent = `[${romaji}]`;
+            hint.style.color = '#007acc';
+            hint.style.fontWeight = 'bold';
+            
+            // 显示提示
+            if (button && button.parentNode) {
+                // 移除已存在的提示
+                const existingHint = button.parentNode.querySelector('.pronounce-hint');
+                if (existingHint) {
+                    existingHint.remove();
+                }
+                
+                button.parentNode.appendChild(hint);
+                
+                // 3秒后移除提示
+                setTimeout(() => {
+                    if (hint.parentNode) {
+                        hint.remove();
+                    }
+                }, 3000);
             }
+            
+            // 提供在线TTS备用链接（仅在移动设备上）
+            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                setTimeout(() => {
+                    if (confirm(`音频播放不可用。\n\n是否使用在线语音服务播放？\n文本: ${text}`)) {
+                        // 使用Google Translate的TTS API（非官方）
+                        const encodedText = encodeURIComponent(text);
+                        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodedText}&tl=ja`;
+                        
+                        const audio = new Audio(ttsUrl);
+                        audio.play().catch(e => {
+                            alert('在线语音服务也无法使用，请参考罗马音发音: ' + romaji);
+                        });
+                    }
+                }, 500);
+            }
+        }
+        
+        // 用户交互激活音频
+        function activateAudio() {
+            if (speechSupported && speechSynthesis) {
+                // 播放一个静音测试来激活音频上下文
+                const testUtterance = new SpeechSynthesisUtterance('');
+                testUtterance.volume = 0;
+                speechSynthesis.speak(testUtterance);
+            }
+            
+            // 移除激活监听器
+            document.removeEventListener('click', activateAudio);
+            document.removeEventListener('touchstart', activateAudio);
+            
+            console.log('✓ 音频上下文已激活');
+        }
+        
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 页面加载完成，初始化音频系统...');
+            
+            // 检查音频支持
+            checkAudioSupport();
+            
+            // 添加用户交互监听器以激活音频
+            document.addEventListener('click', activateAudio, { once: true });
+            document.addEventListener('touchstart', activateAudio, { once: true });
+            
+            // 初始化语音
+            if (speechSupported) {
+                if (speechSynthesis.getVoices().length === 0) {
+                    speechSynthesis.addEventListener('voiceschanged', initJapaneseVoice);
+                } else {
+                    initJapaneseVoice();
+                }
+                
+                // 延迟再次尝试初始化（某些浏览器需要）
+                setTimeout(initJapaneseVoice, 1000);
+            }
+            
+            // 更新所有音频按钮
+            const audioButtons = document.querySelectorAll('.audio-button');
+            audioButtons.forEach((button, index) => {
+                const text = button.getAttribute('onclick').match(/'([^']+)'/)?.[1] || '';
+                button.setAttribute('onclick', '');
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    playJapanese(text, this);
+                });
+                
+                // 添加状态显示
+                if (index === 0) {
+                    const status = document.createElement('span');
+                    status.className = 'audio-status';
+                    status.textContent = '检测中...';
+                    button.parentNode.appendChild(status);
+                }
+            });
             
             // 自动更新页码导航
             updatePagination();
             
-            // 添加点击提示
+            // 添加使用提示
             setTimeout(() => {
-                const firstAudioButton = document.querySelector('.audio-button');
-                if (firstAudioButton) {
-                    firstAudioButton.style.animation = 'pulse 2s infinite';
-                    firstAudioButton.title = '点击播放日语发音';
+                const firstButton = document.querySelector('.audio-button');
+                if (firstButton && speechSupported) {
+                    firstButton.style.animation = 'pulse 2s 3';
+                    firstButton.title = '点击播放日语发音';
                 }
             }, 2000);
+            
+            console.log('✅ 音频系统初始化完成');
         });
-        
+
         // 添加CSS动画
         const style = document.createElement('style');
         style.textContent = `
