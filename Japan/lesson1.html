@@ -6,6 +6,37 @@
     <title>标准日语 初级上册 - 第一课</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Sans+SC&display=swap" rel="stylesheet">
+    <style>
+        .audio-button {
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+        .audio-button:hover {
+            background: #005c99;
+        }
+        .audio-button:active {
+            background: #004d80;
+        }
+        .speech-controls {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        .speed-control {
+            margin-left: 10px;
+        }
+        .speed-control select {
+            font-size: 11px;
+            padding: 2px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -32,7 +63,9 @@
                 <div class="dialogue-line">
                     <p class="speaker">李：</p>
                     <div class="speech">
-                        <p class="japanese speech-text">すみません。</p>
+                        <p class="japanese speech-text">すみません。
+                            <button class="audio-button" onclick="playJapanese('すみません')">🔊</button>
+                        </p>
                         <p class="kana">すみません。</p>
                         <p class="romaji">Sumimasen.</p>
                         <p class="chinese">打扰了。</p>
@@ -42,7 +75,9 @@
                 <div class="dialogue-line">
                     <p class="speaker">森：</p>
                     <div class="speech">
-                        <p class="japanese speech-text">はい、どうぞ。</p>
+                        <p class="japanese speech-text">はい、どうぞ。
+                            <button class="audio-button" onclick="playJapanese('はい、どうぞ')">🔊</button>
+                        </p>
                         <p class="kana">はい、どうぞ。</p>
                         <p class="romaji">Hai, douzo.</p>
                         <p class="chinese">请进。</p>
@@ -52,7 +87,9 @@
                 <div class="dialogue-line">
                     <p class="speaker">李：</p>
                     <div class="speech">
-                        <p class="japanese speech-text">はじめまして。中国から来ました李です。どうぞよろしくお願いします。</p>
+                        <p class="japanese speech-text">はじめまして。中国から来ました李です。どうぞよろしくお願いします。
+                            <button class="audio-button" onclick="playJapanese('はじめまして。中国から来ました李です。どうぞよろしくお願いします')">🔊</button>
+                        </p>
                         <p class="kana">はじめまして。ちゅうごくから きました り です。どうぞよろしく おねがいします。</p>
                         <p class="romaji">Hajimemashite. Chūgoku kara kimashita Ri desu. Douzo yoroshiku onegaishimasu.</p>
                         <p class="chinese">初次见面。我是来自中国的小李。请多多关照。</p>
@@ -62,7 +99,9 @@
                 <div class="dialogue-line">
                     <p class="speaker">森：</p>
                     <div class="speech">
-                        <p class="japanese speech-text">はじめまして。森です。どうぞよろしく。</p>
+                        <p class="japanese speech-text">はじめまして。森です。どうぞよろしく。
+                            <button class="audio-button" onclick="playJapanese('はじめまして。森です。どうぞよろしく')">🔊</button>
+                        </p>
                         <p class="kana">はじめまして。もり です。どうぞよろしく。</p>
                         <p class="romaji">Hajimemashite. Mori desu. Douzo yoroshiku.</p>
                         <p class="chinese">初次见面。我是森。请多关照。</p>
@@ -72,7 +111,9 @@
                 <div class="dialogue-line">
                     <p class="speaker">李：</p>
                     <div class="speech">
-                        <p class="japanese speech-text">日本語を勉強しています。</p>
+                        <p class="japanese speech-text">日本語を勉強しています。
+                            <button class="audio-button" onclick="playJapanese('日本語を勉強しています')">🔊</button>
+                        </p>
                         <p class="kana">にほんごを べんきょうしています。</p>
                         <p class="romaji">Nihongo o benkyō shite imasu.</p>
                         <p class="chinese">我正在学习日语。</p>
@@ -82,7 +123,9 @@
                 <div class="dialogue-line">
                     <p class="speaker">森：</p>
                     <div class="speech">
-                        <p class="japanese speech-text">そうですか。頑張ってください。</p>
+                        <p class="japanese speech-text">そうですか。頑張ってください。
+                            <button class="audio-button" onclick="playJapanese('そうですか。頑張ってください')">🔊</button>
+                        </p>
                         <p class="kana">そうですか。がんばってください。</p>
                         <p class="romaji">Sō desu ka. Ganbatte kudasai.</p>
                         <p class="chinese">是吗？请加油。</p>
@@ -92,7 +135,9 @@
                 <div class="dialogue-line">
                     <p class="speaker">李：</p>
                     <div class="speech">
-                        <p class="japanese speech-text">ありがとうございます。</p>
+                        <p class="japanese speech-text">ありがとうございます。
+                            <button class="audio-button" onclick="playJapanese('ありがとうございます')">🔊</button>
+                        </p>
                         <p class="kana">ありがとうございます。</p>
                         <p class="romaji">Arigatou gozaimasu.</p>
                         <p class="chinese">谢谢您。</p>
@@ -102,7 +147,16 @@
         </section>
 
         <section class="vocabulary">
-            <h3>単語（たんご）- 单词</h3>
+            <h3>単語（たんご）- 单词
+                <div class="speech-controls">
+                    语速: 
+                    <select id="speechRate" class="speed-control">
+                        <option value="0.7">慢速</option>
+                        <option value="0.9" selected>正常</option>
+                        <option value="1.2">快速</option>
+                    </select>
+                </div>
+            </h3>
             <table>
                 <thead>
                     <tr>
@@ -110,6 +164,7 @@
                         <th>假名</th>
                         <th>罗马音</th>
                         <th>中文</th>
+                        <th>发音</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -118,96 +173,112 @@
                         <td>はじめまして</td>
                         <td>hajimemashite</td>
                         <td>初次见面</td>
+                        <td><button class="audio-button" onclick="playJapanese('はじめまして')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">すみません</span></td>
                         <td>すみません</td>
                         <td>sumimasen</td>
                         <td>打扰了、对不起</td>
+                        <td><button class="audio-button" onclick="playJapanese('すみません')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">はい</span></td>
                         <td>はい</td>
                         <td>hai</td>
                         <td>是、好的</td>
+                        <td><button class="audio-button" onclick="playJapanese('はい')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">どうぞ</span></td>
                         <td>どうぞ</td>
                         <td>douzo</td>
                         <td>请</td>
+                        <td><button class="audio-button" onclick="playJapanese('どうぞ')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">中国</span></td>
                         <td>ちゅうごく</td>
                         <td>chūgoku</td>
                         <td>中国</td>
+                        <td><button class="audio-button" onclick="playJapanese('中国')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">から</span></td>
                         <td>から</td>
                         <td>kara</td>
                         <td>从...（助词）</td>
+                        <td><button class="audio-button" onclick="playJapanese('から')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">来ました</span></td>
                         <td>きました</td>
                         <td>kimashita</td>
                         <td>来了（动词"来"的过去式）</td>
+                        <td><button class="audio-button" onclick="playJapanese('来ました')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">です</span></td>
                         <td>です</td>
                         <td>desu</td>
                         <td>是（助动词）</td>
+                        <td><button class="audio-button" onclick="playJapanese('です')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">よろしく</span></td>
                         <td>よろしく</td>
                         <td>yoroshiku</td>
                         <td>请多关照</td>
+                        <td><button class="audio-button" onclick="playJapanese('よろしく')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">お願いします</span></td>
                         <td>おねがいします</td>
                         <td>onegaishimasu</td>
                         <td>拜托了</td>
+                        <td><button class="audio-button" onclick="playJapanese('お願いします')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">日本語</span></td>
                         <td>にほんご</td>
                         <td>nihongo</td>
                         <td>日语</td>
+                        <td><button class="audio-button" onclick="playJapanese('日本語')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">を</span></td>
                         <td>を</td>
                         <td>o</td>
                         <td>（助词，表示动作的对象）</td>
+                        <td><button class="audio-button" onclick="playJapanese('を')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">勉強しています</span></td>
                         <td>べんきょうしています</td>
                         <td>benkyō shite imasu</td>
                         <td>正在学习</td>
+                        <td><button class="audio-button" onclick="playJapanese('勉強しています')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">そうですか</span></td>
                         <td>そうですか</td>
                         <td>sō desu ka</td>
                         <td>是吗？</td>
+                        <td><button class="audio-button" onclick="playJapanese('そうですか')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">頑張ってください</span></td>
                         <td>がんばってください</td>
                         <td>ganbatte kudasai</td>
                         <td>请加油</td>
+                        <td><button class="audio-button" onclick="playJapanese('頑張ってください')">🔊</button></td>
                     </tr>
                     <tr>
                         <td><span class="word-text">ありがとうございます</span></td>
                         <td>ありがとうございます</td>
                         <td>arigatou gozaimasu</td>
                         <td>谢谢</td>
+                        <td><button class="audio-button" onclick="playJapanese('ありがとうございます')">🔊</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -219,13 +290,17 @@
                 <h4>1. 「AはBです」句型</h4>
                 <p>表示"A是B"的意思，是最基本的判断句型。</p>
                 <div class="example">
-                    <p class="japanese speech-text">私は李です。</p>
+                    <p class="japanese speech-text">私は李です。
+                        <button class="audio-button" onclick="playJapanese('私は李です')">🔊</button>
+                    </p>
                     <p class="kana">わたしは り です。</p>
                     <p class="romaji">Watashi wa Ri desu.</p>
                     <p class="chinese">我是李。</p>
                 </div>
                 <div class="example">
-                    <p class="japanese speech-text">これは本です。</p>
+                    <p class="japanese speech-text">これは本です。
+                        <button class="audio-button" onclick="playJapanese('これは本です')">🔊</button>
+                    </p>
                     <p class="kana">これは ほん です。</p>
                     <p class="romaji">Kore wa hon desu.</p>
                     <p class="chinese">这是书。</p>
@@ -236,7 +311,9 @@
                 <h4>2. 「どうぞよろしくお願いします」表达</h4>
                 <p>是一种在初次见面时表达"请多关照"的礼貌用语。</p>
                 <div class="example">
-                    <p class="japanese speech-text">どうぞよろしくお願いします。</p>
+                    <p class="japanese speech-text">どうぞよろしくお願いします。
+                        <button class="audio-button" onclick="playJapanese('どうぞよろしくお願いします')">🔊</button>
+                    </p>
                     <p class="kana">どうぞよろしく おねがいします。</p>
                     <p class="romaji">Douzo yoroshiku onegaishimasu.</p>
                     <p class="chinese">请多多关照。</p>
@@ -515,10 +592,116 @@
     
     <script src="script.js"></script>
     <script>
+        // 日语音频播放功能
+        let speechSynthesis = window.speechSynthesis;
+        let japaneseVoice = null;
+        
+        // 初始化日语语音
+        function initJapaneseVoice() {
+            const voices = speechSynthesis.getVoices();
+            // 寻找日语语音
+            japaneseVoice = voices.find(voice => 
+                voice.lang.includes('ja') || 
+                voice.name.includes('Japanese') ||
+                voice.name.includes('日本') ||
+                voice.name.includes('Kyoko') ||
+                voice.name.includes('Otoya')
+            );
+            
+            // 如果没有找到日语语音，使用默认语音
+            if (!japaneseVoice) {
+                japaneseVoice = voices[0];
+                console.log('未找到日语语音，使用默认语音');
+            } else {
+                console.log('使用日语语音:', japaneseVoice.name);
+            }
+        }
+        
+        // 播放日语音频
+        function playJapanese(text) {
+            // 停止当前播放
+            speechSynthesis.cancel();
+            
+            if (!japaneseVoice) {
+                initJapaneseVoice();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // 设置语音参数
+            if (japaneseVoice) {
+                utterance.voice = japaneseVoice;
+            }
+            utterance.lang = 'ja-JP';
+            utterance.rate = parseFloat(document.getElementById('speechRate')?.value || 0.9);
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            // 错误处理
+            utterance.onerror = function(event) {
+                console.error('语音播放错误:', event.error);
+                // 尝试备用方案
+                if (event.error === 'not-allowed' || event.error === 'network') {
+                    alert('音频播放被阻止，请检查浏览器设置或网络连接');
+                }
+            };
+            
+            utterance.onstart = function() {
+                console.log('开始播放:', text);
+            };
+            
+            utterance.onend = function() {
+                console.log('播放结束:', text);
+            };
+            
+            // 播放
+            try {
+                speechSynthesis.speak(utterance);
+            } catch (error) {
+                console.error('播放失败:', error);
+                alert('音频播放失败，请尝试刷新页面或使用其他浏览器');
+            }
+        }
+        
+        // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
+            // 等待语音API加载
+            if (speechSynthesis.getVoices().length === 0) {
+                speechSynthesis.addEventListener('voiceschanged', initJapaneseVoice);
+            } else {
+                initJapaneseVoice();
+            }
+            
             // 自动更新页码导航
             updatePagination();
+            
+            // 添加点击提示
+            setTimeout(() => {
+                const firstAudioButton = document.querySelector('.audio-button');
+                if (firstAudioButton) {
+                    firstAudioButton.style.animation = 'pulse 2s infinite';
+                    firstAudioButton.title = '点击播放日语发音';
+                }
+            }, 2000);
         });
+        
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+            .audio-button {
+                transition: all 0.2s ease;
+            }
+            .audio-button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        `;
+        document.head.appendChild(style);
 
         function updatePagination() {
             // 获取当前页面文件名
