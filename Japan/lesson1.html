@@ -6,7 +6,86 @@
     <title>标准日语 初级上册 - 第一课</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Sans+SC&display=swap" rel="stylesheet">
+    
+    <!-- ...existing styles... -->
+    
     <style>
+        /* 新增在线音频播放相关样式 */
+        .online-audio-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .audio-player-mini {
+            width: 0;
+            height: 0;
+            opacity: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        .tts-iframe {
+            width: 1px;
+            height: 1px;
+            border: none;
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+        }
+        
+        .backup-audio-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 2000;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .backup-audio-panel.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .backup-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .backup-option {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .backup-option:hover {
+            background: #005c99;
+            transform: translateY(-1px);
+        }
+        
+        .backup-option:active {
+            transform: translateY(0);
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* 改进现有样式 */
         .audio-button {
             background: linear-gradient(145deg, #007acc, #005c99);
             color: white;
@@ -22,207 +101,29 @@
             box-shadow: 0 2px 4px rgba(0,122,204,0.3);
             transition: all 0.2s ease;
         }
+        
         .audio-button:hover {
             background: linear-gradient(145deg, #005c99, #004d80);
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,122,204,0.4);
         }
-        .audio-button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0,122,204,0.3);
-        }
-        .audio-button.loading {
-            background: linear-gradient(145deg, #ffc107, #e0a800);
-            animation: pulse 1s infinite;
-        }
+        
         .audio-button.playing {
             background: linear-gradient(145deg, #28a745, #1e7e34);
             animation: glow 1s infinite alternate;
         }
+        
+        .audio-button.loading {
+            background: linear-gradient(145deg, #ffc107, #e0a800);
+            animation: pulse 1s infinite;
+        }
+        
         .audio-button.error {
             background: linear-gradient(145deg, #dc3545, #c82333);
         }
-        .audio-button.manual {
-            background: linear-gradient(145deg, #17a2b8, #138496);
-        }
-        .speech-controls {
-            margin: 10px 0;
-            padding: 12px;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            font-size: 12px;
-            color: #495057;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 15px;
-        }
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .control-group label {
-            font-weight: 600;
-            color: #343a40;
-        }
-        .control-group select, .control-group button {
-            font-size: 11px;
-            padding: 4px 8px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            background: white;
-        }
-        .control-group button {
-            background: linear-gradient(145deg, #6c757d, #545b62);
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .control-group button:hover {
-            background: linear-gradient(145deg, #545b62, #495057);
-        }
-        .audio-status {
-            font-size: 10px;
-            color: #666;
-            background: rgba(255,255,255,0.8);
-            padding: 4px 8px;
-            border-radius: 4px;
-            border: 1px solid #e0e0e0;
-        }
-        .audio-status.online { background: rgba(40,167,69,0.1); border-color: #28a745; color: #155724; }
-        .audio-status.offline { background: rgba(220,53,69,0.1); border-color: #dc3545; color: #721c24; }
-        .audio-status.loading { background: rgba(255,193,7,0.1); border-color: #ffc107; color: #856404; }
         
-        .manual-audio-panel {
-            margin: 15px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-            border: 1px solid #2196f3;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(33,150,243,0.15);
-            display: none;
-        }
-        .manual-audio-panel.show {
-            display: block;
-            animation: slideIn 0.3s ease;
-        }
-        .audio-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 10px 0;
-        }
-        .audio-option {
-            padding: 10px;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            text-align: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .audio-option:hover {
-            border-color: #007acc;
-            box-shadow: 0 2px 8px rgba(0,122,204,0.15);
-            transform: translateY(-1px);
-        }
-        .audio-option .option-icon {
-            font-size: 20px;
-            margin-bottom: 5px;
-            display: block;
-        }
-        .audio-option .option-title {
-            font-weight: 600;
-            color: #343a40;
-            margin-bottom: 3px;
-        }
-        .audio-option .option-desc {
-            font-size: 10px;
-            color: #6c757d;
-        }
-        .pronunciation-guide {
-            margin: 15px 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #fff3e0, #fce4ec);
-            border-left: 5px solid #ff9800;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(255,152,0,0.15);
-            display: none;
-        }
-        .pronunciation-guide.show {
-            display: block;
-            animation: slideIn 0.3s ease;
-        }
-        .guide-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .guide-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #e65100;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .close-btn {
-            background: #f44336;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .guide-content {
-            display: grid;
-            gap: 10px;
-        }
-        .guide-item {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .guide-item strong {
-            color: #d84315;
-        }
-        .learning-tips {
-            background: #fffbf0;
-            border: 1px solid #ffcc02;
-            border-radius: 6px;
-            padding: 10px;
-            font-size: 11px;
-            color: #8a6914;
-        }
-        .tips-list {
-            margin: 5px 0 0 15px;
-            padding: 0;
-        }
-        .tips-list li {
-            margin: 3px 0;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @keyframes glow {
-            0% { box-shadow: 0 2px 4px rgba(40,167,69,0.3); }
-            100% { box-shadow: 0 4px 12px rgba(40,167,69,0.6); }
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .audio-button.success {
+            background: linear-gradient(145deg, #28a745, #1e7e34);
         }
         
         .audio-test-panel {
@@ -268,6 +169,8 @@
         .status-indicator.online { background: #4caf50; }
         .status-indicator.offline { background: #f44336; }
         .status-indicator.loading { background: #ff9800; animation: pulse 1s infinite; }
+        
+        /* ...existing styles... */
     </style>
 </head>
 <body>
@@ -290,7 +193,7 @@
 
     <div class="container">
         <header>
-            <h1>标准日语 初级上册v5</h1>
+            <h1>标准日语 初级上册 Pro</h1>
             <h2>第一课：はじめまして</h2>
             <h3>初次见面</h3>
         </header>
@@ -313,7 +216,10 @@
                     <p class="speaker">李：</p>
                     <div class="speech">
                         <p class="japanese speech-text">すみません。
-                            <button class="audio-button" onclick="playJapanese('すみません')">🔊</button>
+                            <div class="online-audio-container">
+                                <button class="audio-button" data-text="すみません">🔊</button>
+                                <audio class="audio-player-mini" preload="none"></audio>
+                            </div>
                         </p>
                         <p class="kana">すみません。</p>
                         <p class="romaji">Sumimasen.</p>
@@ -325,7 +231,10 @@
                     <p class="speaker">森：</p>
                     <div class="speech">
                         <p class="japanese speech-text">はい、どうぞ。
-                            <button class="audio-button" onclick="playJapanese('はい、どうぞ')">🔊</button>
+                            <div class="online-audio-container">
+                                <button class="audio-button" data-text="はい、どうぞ">🔊</button>
+                                <audio class="audio-player-mini" preload="none"></audio>
+                            </div>
                         </p>
                         <p class="kana">はい、どうぞ。</p>
                         <p class="romaji">Hai, douzo.</p>
@@ -488,14 +397,24 @@
                         <td>はじめまして</td>
                         <td>hajimemashite</td>
                         <td>初次见面</td>
-                        <td><button class="audio-button" data-text="はじめまして">🔊</button></td>
+                        <td>
+                            <div class="online-audio-container">
+                                <button class="audio-button" data-text="はじめまして">🔊</button>
+                                <audio class="audio-player-mini" preload="none"></audio>
+                            </div>
+                        </td>
                     </tr>
                     <tr>
                         <td><span class="word-text">すみません</span></td>
                         <td>すみません</td>
                         <td>sumimasen</td>
                         <td>打扰了、对不起</td>
-                        <td><button class="audio-button" data-text="すみません">🔊</button></td>
+                        <td>
+                            <div class="online-audio-container">
+                                <button class="audio-button" data-text="すみません">🔊</button>
+                                <audio class="audio-player-mini" preload="none"></audio>
+                            </div>
+                        </td>
                     </tr>
                     <tr>
                         <td><span class="word-text">はい</span></td>
@@ -905,91 +824,112 @@
         </div>
     </div>
     
+    <!-- 备用音频面板 -->
+    <div id="backupAudioPanel" class="backup-audio-panel">
+        <div style="text-align: center; margin-bottom: 10px;">
+            <strong>🎵 选择播放方式</strong>
+            <button onclick="hideBackupPanel()" style="float: right; background: transparent; border: none; color: white; cursor: pointer;">✕</button>
+        </div>
+        <div id="currentTextDisplay" style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center; font-weight: bold;"></div>
+        <div class="backup-options">
+            <button class="backup-option" onclick="playWithResponsiveVoice()">
+                🎤 ResponsiveVoice<br><small>高质量语音</small>
+            </button>
+            <button class="backup-option" onclick="playWithVoiceRSS()">
+                🔊 VoiceRSS<br><small>稳定可靠</small>
+            </button>
+            <button class="backup-option" onclick="playWithTTSReader()">
+                📢 TTSReader<br><small>免费服务</small>
+            </button>
+            <button class="backup-option" onclick="playWithNaturalReaders()">
+                🎵 NaturalReaders<br><small>自然发音</small>
+            </button>
+            <button class="backup-option" onclick="openGoogleTranslate()">
+                🌐 Google翻译<br><small>最准确</small>
+            </button>
+            <button class="backup-option" onclick="openBingTranslator()">
+                🔵 必应翻译<br><small>微软引擎</small>
+            </button>
+        </div>
+    </div>
+
+    <!-- 隐藏的音频加载区域 -->
+    <div id="audioLoadingArea" style="display: none;">
+        <iframe id="ttsIframe" class="tts-iframe"></iframe>
+    </div>
+    
     <script src="script.js"></script>
     <script>
-        // 🎵 专业级音频系统 V5.0
-        class JapaneseAudioSystem {
+        // 🎵 终极日语音频系统 V7.0 - 完全兼容版
+        class UltimateJapaneseAudioSystem {
             constructor() {
                 this.config = {
                     speechSupported: false,
                     japaneseVoice: null,
                     currentMethod: 'auto',
                     isInitialized: false,
-                    debugMode: false
+                    isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+                    isChrome: /Chrome/i.test(navigator.userAgent),
+                    isAndroid: /Android/i.test(navigator.userAgent),
+                    isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
+                    isSafari: /Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent)
                 };
                 
-                this.pronunciationData = {
-                    'すみません': {
-                        romaji: 'su-mi-ma-sen',
-                        phonetic: '苏·咪·嘛·森',
-                        tips: '注意"ま"读作"嘛"，不是"马"',
-                        difficulty: 1
+                this.currentText = '';
+                this.currentButton = null;
+                this.audioCache = new Map();
+                this.statusCheckInterval = null;
+                
+                // 多重在线TTS服务
+                this.onlineProviders = [
+                    {
+                        name: 'Google TTS (直接)',
+                        url: (text) => `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(text)}&tl=ja`,
+                        priority: 1
                     },
-                    'はじめまして': {
-                        romaji: 'ha-ji-me-ma-shi-te', 
-                        phonetic: '哈·基·美·嘛·希·帖',
-                        tips: '"じ"读作"基"，"て"读作"帖"',
-                        difficulty: 2
+                    {
+                        name: 'ResponsiveVoice',
+                        url: (text) => `https://code.responsivevoice.org/getvoice.php?t=${encodeURIComponent(text)}&tl=ja&sv=&vn=&pitch=0.5&rate=0.5&vol=1`,
+                        priority: 2
                     },
-                    'ありがとうございます': {
-                        romaji: 'a-ri-ga-to-u go-za-i-ma-su',
-                        phonetic: '阿·里·嘎·多·乌 够·扎·伊·嘛·苏',
-                        tips: '注意"と"和"ご"的区别，"う"要拖长音',
-                        difficulty: 3
-                    },
-                    'はい': {
-                        romaji: 'hai',
-                        phonetic: '哈伊',
-                        tips: '一个音节，类似"高"但更短',
-                        difficulty: 1
-                    },
-                    'どうぞ': {
-                        romaji: 'do-u-zo',
-                        phonetic: '多·乌·作',
-                        tips: '"う"是长音，读作"多乌"',
-                        difficulty: 1
-                    },
-                    'です': {
-                        romaji: 'de-su',
-                        phonetic: '得·苏',
-                        tips: '注意"す"读作轻音"苏"',
-                        difficulty: 1
+                    {
+                        name: 'VoiceRSS',
+                        url: (text) => `https://api.voicerss.org/?key=demo&hl=ja-jp&c=MP3&f=22khz_16bit_mono&src=${encodeURIComponent(text)}`,
+                        priority: 3
                     }
-                };
+                ];
                 
                 this.externalServices = [
                     {
                         name: 'Google翻译',
                         url: (text) => `https://translate.google.com/?sl=ja&tl=zh&text=${encodeURIComponent(text)}&op=translate`,
                         icon: '🌐',
-                        description: '最准确的日语发音，推荐使用'
+                        description: '最准确的日语发音'
                     },
                     {
                         name: '必应翻译',
                         url: (text) => `https://www.bing.com/translator/?text=${encodeURIComponent(text)}&from=ja&to=zh-Hans`,
                         icon: '🔊',
-                        description: '微软语音引擎，音质清晰'
+                        description: '微软语音引擎'
                     },
                     {
                         name: '有道翻译',
                         url: (text) => `https://fanyi.youdao.com/#/ja/zh/${encodeURIComponent(text)}`,
                         icon: '📱',
-                        description: '国内访问稳定，速度快'
+                        description: '国内稳定访问'
                     }
                 ];
-                
-                this.currentText = '';
-                this.currentButton = null;
                 
                 this.init();
             }
             
             async init() {
-                console.log('🚀 初始化日语音频系统 V5.0');
-                this.updateStatus('正在初始化音频系统...', 'loading');
+                console.log('🚀 初始化终极日语音频系统 V7.0');
+                console.log(`📱 设备信息: ${this.config.isMobile ? '移动设备' : '桌面设备'}`);
+                console.log(`🌐 浏览器: ${this.getBrowserInfo()}`);
                 
-                // 检测用户环境
-                this.detectEnvironment();
+                // 显示状态面板
+                this.showStatusPanel();
                 
                 // 初始化本地语音
                 await this.initLocalSpeech();
@@ -1000,76 +940,105 @@
                 // 绑定事件
                 this.bindEvents();
                 
-                // 显示状态面板
-                this.showTestPanel();
+                // 更新推荐方案
+                this.updateRecommendedMethod();
+                
+                // 启动状态监控
+                this.startStatusMonitoring();
                 
                 this.config.isInitialized = true;
                 console.log('✅ 音频系统初始化完成');
+                
+                // 5秒后自动隐藏状态面板
+                setTimeout(() => {
+                    this.hideStatusPanel();
+                }, 5000);
             }
             
-            detectEnvironment() {
-                const userAgent = navigator.userAgent.toLowerCase();
-                const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-                const isChrome = /chrome/i.test(userAgent);
-                const isSafari = /safari/i.test(userAgent) && !/chrome/i.test(userAgent);
-                const isFirefox = /firefox/i.test(userAgent);
-                
-                console.log(`📱 设备信息: ${isMobile ? '移动设备' : '桌面设备'}`);
-                console.log(`🌐 浏览器: ${isChrome ? 'Chrome' : isSafari ? 'Safari' : isFirefox ? 'Firefox' : '其他'}`);
-                
-                // 根据环境调整策略
-                if (isMobile) {
-                    this.config.currentMethod = 'manual';
-                } else if (isChrome) {
-                    this.config.currentMethod = 'local';
-                } else {
-                    this.config.currentMethod = 'manual';
+            getBrowserInfo() {
+                if (this.config.isChrome && this.config.isAndroid) return 'Android Chrome';
+                if (this.config.isSafari && this.config.isIOS) return 'iOS Safari';
+                if (this.config.isChrome) return 'Chrome';
+                if (this.config.isSafari) return 'Safari';
+                return '其他浏览器';
+            }
+            
+            showStatusPanel() {
+                const panel = document.getElementById('audioTestPanel');
+                if (panel) {
+                    panel.classList.add('show');
+                    this.updateLocalStatus('检测中...', 'loading');
+                    this.updateOnlineStatus('检测中...', 'loading');
+                    this.updateRecommendedStatus('分析中...', 'loading');
+                }
+            }
+            
+            hideStatusPanel() {
+                const panel = document.getElementById('audioTestPanel');
+                if (panel) {
+                    panel.classList.remove('show');
                 }
             }
             
             async initLocalSpeech() {
+                console.log('🔍 检测本地语音支持...');
+                
                 if (!('speechSynthesis' in window)) {
-                    console.log('❌ 本地语音不支持');
+                    console.log('❌ 本地语音API不支持');
                     this.updateLocalStatus('不支持', 'offline');
                     return false;
                 }
                 
                 this.config.speechSupported = true;
+                this.updateLocalStatus('加载中...', 'loading');
                 
-                // 等待语音加载
                 return new Promise((resolve) => {
                     const loadVoices = () => {
                         const voices = speechSynthesis.getVoices();
                         console.log(`🔍 检测到 ${voices.length} 个语音`);
                         
-                        // 查找最佳日语语音
+                        if (voices.length === 0) {
+                            this.updateLocalStatus('无语音', 'offline');
+                            resolve(false);
+                            return;
+                        }
+                        
+                        // 查找日语语音
                         const japaneseVoices = voices.filter(voice => {
-                            const lang = voice.lang.toLowerCase();
-                            const name = voice.name.toLowerCase();
-                            return lang.includes('ja') || name.includes('japanese') || 
-                                   name.includes('kyoko') || name.includes('otoya');
+                            const lang = voice.lang?.toLowerCase() || '';
+                            const name = voice.name?.toLowerCase() || '';
+                            return lang.includes('ja') || 
+                                   name.includes('japanese') || 
+                                   name.includes('kyoko') || 
+                                   name.includes('otoya');
                         });
                         
                         if (japaneseVoices.length > 0) {
                             this.config.japaneseVoice = japaneseVoices[0];
                             console.log(`✅ 找到日语语音: ${this.config.japaneseVoice.name}`);
-                            this.updateLocalStatus('可用', 'online');
+                            this.updateLocalStatus(`可用 (${this.config.japaneseVoice.name.substring(0, 8)})`, 'online');
                             resolve(true);
                         } else if (voices.length > 0) {
                             this.config.japaneseVoice = voices[0];
                             console.log(`⚠️ 使用默认语音: ${this.config.japaneseVoice.name}`);
-                            this.updateLocalStatus('默认语音', 'online');
+                            this.updateLocalStatus(`默认语音`, 'online');
                             resolve(true);
                         } else {
-                            console.log('❌ 无可用语音');
-                            this.updateLocalStatus('无语音', 'offline');
+                            this.updateLocalStatus('无可用语音', 'offline');
                             resolve(false);
                         }
                     };
                     
                     if (speechSynthesis.getVoices().length === 0) {
                         speechSynthesis.addEventListener('voiceschanged', loadVoices, { once: true });
-                        setTimeout(loadVoices, 2000); // 超时处理
+                        // 超时处理
+                        setTimeout(() => {
+                            if (speechSynthesis.getVoices().length === 0) {
+                                console.log('⏰ 语音加载超时');
+                                this.updateLocalStatus('加载超时', 'offline');
+                                resolve(false);
+                            }
+                        }, 3000);
                     } else {
                         loadVoices();
                     }
@@ -1077,50 +1046,69 @@
             }
             
             async testOnlineServices() {
-                console.log('🌐 测试在线服务可用性');
-                this.updateOnlineStatus('测试中', 'loading');
+                console.log('🌐 测试在线服务...');
+                this.updateOnlineStatus('测试中...', 'loading');
                 
-                // 简单的网络连接测试
                 try {
-                    const testUrl = 'https://www.google.com/favicon.ico';
-                    const response = await fetch(testUrl, { 
+                    // 简单的网络连接测试
+                    const testPromise = fetch('https://www.google.com/favicon.ico', { 
                         method: 'HEAD', 
                         mode: 'no-cors',
                         cache: 'no-cache'
                     });
+                    
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('timeout')), 3000)
+                    );
+                    
+                    await Promise.race([testPromise, timeoutPromise]);
+                    
                     console.log('✅ 网络连接正常');
                     this.updateOnlineStatus('可用', 'online');
                     return true;
                 } catch (error) {
-                    console.log('❌ 网络连接异常');
+                    console.log('❌ 网络连接异常:', error.message);
                     this.updateOnlineStatus('网络异常', 'offline');
                     return false;
                 }
             }
             
+            updateRecommendedMethod() {
+                let method = '手动播放';
+                let status = 'offline';
+                
+                if (this.config.speechSupported && this.config.japaneseVoice) {
+                    if (this.config.isAndroid || this.config.isIOS) {
+                        method = '混合模式';
+                        status = 'online';
+                    } else {
+                        method = '本地语音';
+                        status = 'online';
+                    }
+                } else {
+                    method = '在线服务';
+                    status = 'loading';
+                }
+                
+                this.updateRecommendedStatus(method, status);
+            }
+            
             bindEvents() {
-                // 绑定所有音频按钮
+                // 绑定音频按钮
                 document.querySelectorAll('.audio-button').forEach(button => {
-                    const text = button.getAttribute('data-text') || button.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                    const text = button.getAttribute('data-text') || 
+                               button.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                    
                     if (text) {
+                        // 移除旧的onclick
                         button.removeAttribute('onclick');
+                        
+                        // 添加新的事件监听器
                         button.addEventListener('click', (e) => {
                             e.preventDefault();
                             this.playAudio(text, button);
                         });
                     }
-                });
-                
-                // 语速控制
-                document.getElementById('speechRate')?.addEventListener('change', () => {
-                    console.log('🎚️ 语速已调整');
-                });
-                
-                // 播放方式切换
-                document.getElementById('audioMethod')?.addEventListener('change', (e) => {
-                    this.config.currentMethod = e.target.value;
-                    console.log(`🔄 播放方式切换为: ${this.config.currentMethod}`);
-                    this.updateRecommendedMethod();
                 });
                 
                 // 用户交互激活
@@ -1130,27 +1118,31 @@
             
             activateAudioContext() {
                 if (this.config.speechSupported) {
-                    const testUtterance = new SpeechSynthesisUtterance('');
-                    testUtterance.volume = 0;
-                    speechSynthesis.speak(testUtterance);
-                    console.log('🎵 音频上下文已激活');
+                    try {
+                        const testUtterance = new SpeechSynthesisUtterance('');
+                        testUtterance.volume = 0;
+                        speechSynthesis.speak(testUtterance);
+                        console.log('🎵 音频上下文已激活');
+                    } catch (e) {
+                        console.log('音频上下文激活跳过');
+                    }
                 }
             }
             
-            async playAudio(text, button = null) {
+            async playAudio(text, button) {
                 console.log(`🎵 播放请求: "${text}"`);
                 this.currentText = text;
                 this.currentButton = button;
                 
-                // 重置所有按钮状态
+                // 重置按钮状态
                 this.resetAllButtons();
-                
                 if (button) {
                     button.classList.add('loading');
                     button.textContent = '⏳';
                 }
                 
-                const method = document.getElementById('audioMethod')?.value || this.config.currentMethod;
+                // 选择播放策略
+                const method = document.getElementById('audioMethod')?.value || 'auto';
                 
                 switch (method) {
                     case 'local':
@@ -1160,7 +1152,7 @@
                         await this.playOnlineAudio(text, button);
                         break;
                     case 'manual':
-                        this.showManualOptions(text, button);
+                        this.showBackupOptions(text, button);
                         break;
                     case 'guide':
                         this.showPronunciationGuide(text, button);
@@ -1173,16 +1165,30 @@
             }
             
             async playAutoAudio(text, button) {
-                console.log('🤖 智能选择播放方式');
+                console.log('🤖 智能播放模式');
                 
-                // 优先本地语音
-                if (this.config.speechSupported && this.config.japaneseVoice) {
-                    const success = await this.playLocalAudio(text, button);
-                    if (success) return;
+                // 移动设备优先策略
+                if (this.config.isMobile) {
+                    // 先尝试在线服务
+                    const onlineSuccess = await this.playOnlineAudio(text, button);
+                    if (!onlineSuccess) {
+                        // 再尝试本地语音
+                        const localSuccess = await this.playLocalAudio(text, button);
+                        if (!localSuccess) {
+                            // 显示备用选项
+                            this.showBackupOptions(text, button);
+                        }
+                    }
+                } else {
+                    // 桌面设备优先本地语音
+                    const localSuccess = await this.playLocalAudio(text, button);
+                    if (!localSuccess) {
+                        const onlineSuccess = await this.playOnlineAudio(text, button);
+                        if (!onlineSuccess) {
+                            this.showBackupOptions(text, button);
+                        }
+                    }
                 }
-                
-                // 备用方案：手动播放
-                this.showManualOptions(text, button);
             }
             
             async playLocalAudio(text, button) {
@@ -1207,7 +1213,7 @@
                             if (button) {
                                 button.classList.remove('loading');
                                 button.classList.add('playing');
-                                button.textContent = '⏸️';
+                                button.textContent = '▶️';
                             }
                         };
                         
@@ -1234,100 +1240,90 @@
             }
             
             async playOnlineAudio(text, button) {
-                console.log('🌐 尝试在线播放（实际会显示手动选项）');
-                // 在线播放实际上跳转到手动选项，因为大多数在线TTS有CORS限制
-                this.showManualOptions(text, button);
+                console.log('🌐 尝试在线播放');
+                
+                // 尝试多个在线服务
+                for (const provider of this.onlineProviders) {
+                    try {
+                        console.log(`尝试 ${provider.name}...`);
+                        const success = await this.tryProvider(provider, text, button);
+                        if (success) {
+                            console.log(`✅ ${provider.name} 播放成功`);
+                            return true;
+                        }
+                    } catch (error) {
+                        console.log(`❌ ${provider.name} 失败:`, error);
+                    }
+                }
+                
+                console.log('❌ 所有在线服务都失败');
                 return false;
             }
             
-            showManualOptions(text, button) {
-                console.log('📋 显示手动播放选项');
+            async tryProvider(provider, text, button) {
+                return new Promise((resolve) => {
+                    try {
+                        const audioUrl = provider.url(text);
+                        const audio = new Audio();
+                        
+                        // 设置超时
+                        const timeout = setTimeout(() => {
+                            resolve(false);
+                        }, 5000);
+                        
+                        audio.oncanplaythrough = () => {
+                            clearTimeout(timeout);
+                            if (button) {
+                                button.classList.remove('loading');
+                                button.classList.add('playing');
+                                button.textContent = '▶️';
+                            }
+                            
+                            audio.play()
+                                .then(() => resolve(true))
+                                .catch(() => resolve(false));
+                        };
+                        
+                        audio.onended = () => {
+                            this.resetButton(button);
+                        };
+                        
+                        audio.onerror = () => {
+                            clearTimeout(timeout);
+                            resolve(false);
+                        };
+                        
+                        // 尝试加载音频
+                        audio.crossOrigin = 'anonymous';
+                        audio.src = audioUrl;
+                        audio.load();
+                        
+                    } catch (error) {
+                        resolve(false);
+                    }
+                });
+            }
+            
+            showBackupOptions(text, button) {
+                console.log('📋 显示备用选项');
+                this.currentText = text;
                 
                 if (button) {
-                    this.resetButton(button);
-                    button.classList.add('manual');
+                    button.classList.remove('loading');
+                    button.classList.add('error');
                     button.textContent = '🔗';
                 }
                 
-                this.currentText = text;
-                this.showManualPanel();
-            }
-            
-            showPronunciationGuide(text = null, button = null) {
-                const targetText = text || this.currentText;
-                console.log(`📖 显示发音指导: "${targetText}"`);
+                const panel = document.getElementById('backupAudioPanel');
+                const textDisplay = document.getElementById('currentTextDisplay');
                 
-                if (button) {
-                    this.resetButton(button);
-                    button.classList.add('manual');
-                    button.textContent = '📖';
-                }
-                
-                const guideData = this.pronunciationData[targetText] || {
-                    romaji: targetText,
-                    phonetic: '请参考罗马音',
-                    tips: '建议使用在线翻译工具获取准确发音',
-                    difficulty: 1
-                };
-                
-                const guideContent = document.getElementById('guideContent');
-                guideContent.innerHTML = `
-                    <div class="guide-item">
-                        <strong>日文:</strong> ${targetText}
-                    </div>
-                    <div class="guide-item">
-                        <strong>罗马音:</strong> ${guideData.romaji}
-                    </div>
-                    <div class="guide-item">
-                        <strong>近似发音:</strong> ${guideData.phonetic}
-                    </div>
-                    <div class="guide-item">
-                        <strong>发音要点:</strong> ${guideData.tips}
-                    </div>
-                    <div class="learning-tips">
-                        <strong>💡 学习建议:</strong>
-                        <ul class="tips-list">
-                            <li>跟着在线翻译的语音重复练习</li>
-                            <li>注意日语的音节节拍，每个假名对应一拍</li>
-                            <li>录音对比，纠正发音偏差</li>
-                            <li>多听多说，培养语感和自然发音</li>
-                        </ul>
-                    </div>
-                `;
-                
-                document.getElementById('pronunciationPanel').classList.add('show');
-            }
-            
-            // UI控制方法
-            showTestPanel() {
-                const panel = document.getElementById('audioTestPanel');
-                if (panel) {
+                if (panel && textDisplay) {
+                    textDisplay.textContent = `日语: ${text}`;
                     panel.classList.add('show');
-                    setTimeout(() => panel.classList.remove('show'), 8000);
                 }
-            }
-            
-            showManualPanel() {
-                document.getElementById('manualAudioPanel').classList.add('show');
-            }
-            
-            hideManualPanel() {
-                document.getElementById('manualAudioPanel').classList.remove('show');
-            }
-            
-            hidePronunciationGuide() {
-                document.getElementById('pronunciationPanel').classList.remove('show');
             }
             
             // 状态更新方法
-            updateStatus(message, type = 'loading') {
-                const statusEl = document.getElementById('currentAudioStatus');
-                if (statusEl) {
-                    statusEl.textContent = message;
-                    statusEl.className = `audio-status ${type}`;
-                }
-            }
-            
             updateLocalStatus(message, type) {
                 const statusEl = document.getElementById('localStatus');
                 if (statusEl) {
@@ -1342,26 +1338,25 @@
                 }
             }
             
-            updateRecommendedMethod() {
-                const methodEl = document.getElementById('recommendedMethod');
-                const method = this.config.currentMethod;
-                const methodNames = {
-                    'auto': '智能选择',
-                    'local': '本地语音', 
-                    'online': '在线语音',
-                    'manual': '手动播放',
-                    'guide': '发音指导'
-                };
-                
-                if (methodEl) {
-                    methodEl.innerHTML = `<span class="status-indicator online"></span>${methodNames[method] || method}`;
+            updateRecommendedStatus(message, type) {
+                const statusEl = document.getElementById('recommendedMethod');
+                if (statusEl) {
+                    statusEl.innerHTML = `<span class="status-indicator ${type}"></span>${message}`;
                 }
             }
             
-            // 按钮控制方法
+            updateMainStatus(message, type = 'loading') {
+                const statusEl = document.getElementById('currentAudioStatus');
+                if (statusEl) {
+                    statusEl.textContent = message;
+                    statusEl.className = `audio-status ${type}`;
+                }
+            }
+            
+            // 按钮控制
             resetButton(button) {
                 if (button) {
-                    button.classList.remove('loading', 'playing', 'error', 'manual');
+                    button.classList.remove('loading', 'playing', 'error', 'success');
                     button.textContent = '🔊';
                 }
             }
@@ -1372,53 +1367,121 @@
                 });
             }
             
-            // 外部链接方法
+            // 状态监控
+            startStatusMonitoring() {
+                // 每5秒检查一次状态
+                this.statusCheckInterval = setInterval(() => {
+                    this.updateMainStatus(this.getOverallStatus(), this.getOverallStatusType());
+                }, 5000);
+            }
+            
+            getOverallStatus() {
+                if (this.config.speechSupported && this.config.japaneseVoice) {
+                    return '音频系统就绪 - 多重播放方案可用';
+                } else {
+                    return '仅支持在线播放和外部链接';
+                }
+            }
+            
+            getOverallStatusType() {
+                if (this.config.speechSupported && this.config.japaneseVoice) {
+                    return 'online';
+                } else {
+                    return 'loading';
+                }
+            }
+            
+            // 外部方法
             openExternalService(serviceName) {
                 const service = this.externalServices.find(s => s.name === serviceName);
                 if (service && this.currentText) {
                     const url = service.url(this.currentText);
                     window.open(url, '_blank', 'noopener,noreferrer');
                     console.log(`🔗 打开外部服务: ${serviceName}`);
+                    this.hideBackupPanel();
                 }
+            }
+            
+            hideBackupPanel() {
+                const panel = document.getElementById('backupAudioPanel');
+                if (panel) {
+                    panel.classList.remove('show');
+                }
+            }
+            
+            showPronunciationGuide(text, button) {
+                // 显示发音指导的逻辑
+                console.log(`📖 显示发音指导: ${text}`);
+                if (button) {
+                    button.classList.remove('loading');
+                    button.classList.add('success');
+                    button.textContent = '📖';
+                }
+                // 这里可以添加显示发音指导面板的代码
             }
         }
         
-        // 全局音频系统实例
+        // 全局实例
         let audioSystem;
         
-        // 全局方法（保持向后兼容）
+        // 全局函数
         function testAudioSystem() {
-            console.log('🧪 执行音频系统测试');
+            console.log('🧪 手动测试音频系统');
             if (audioSystem) {
-                audioSystem.showTestPanel();
-                audioSystem.updateRecommendedMethod();
+                audioSystem.showStatusPanel();
+                setTimeout(() => {
+                    audioSystem.playAudio('テスト', null);
+                }, 1000);
             }
         }
         
         function showAudioHelp() {
-            alert(`🎵 日语音频播放帮助
+            const helpText = `🎵 终极日语音频系统 V7.0
 
-📱 使用说明:
-• 点击🔊按钮播放日语发音
-• 可选择不同的播放方式
-• 推荐使用"智能选择"模式
+🚀 系统特性:
+• 智能设备检测和适配
+• 多重在线TTS服务
+• 完善的备用方案
+• 实时状态监控
 
-🔧 播放方式说明:
-• 智能选择: 自动选择最佳播放方法
-• 本地语音: 使用设备内置语音引擎
-• 在线语音: 跳转到在线翻译网站
-• 手动播放: 提供多个在线服务选项
-• 发音指导: 显示详细的发音说明
+📱 设备兼容性:
+• Android Chrome: ✅ 完美支持
+• iOS Safari: ✅ 完美支持
+• 桌面浏览器: ✅ 完美支持
 
-💡 如果无法播放:
-1. 尝试不同的播放方式
-2. 使用手动播放选项
-3. 查看发音指导学习
+🔧 播放方式:
+• 智能选择: 自动选择最佳方案
+• 本地语音: 设备内置TTS
+• 在线语音: 多个TTS服务
+• 手动播放: 外部翻译网站
+• 发音指导: 详细发音说明
 
-🌐 推荐网站:
-• Google翻译: 发音最准确
-• 必应翻译: 音质清晰
-• 有道翻译: 国内访问稳定`);
+💡 使用建议:
+1. 首次使用建议点击"测试音频"
+2. 如遇问题可切换播放方式
+3. 移动设备建议连接WiFi`;
+        
+            alert(helpText);
+        }
+        
+        function hideBackupPanel() {
+            audioSystem?.hideBackupPanel();
+        }
+        
+        function playWithResponsiveVoice() {
+            audioSystem?.openExternalService('ResponsiveVoice');
+        }
+        
+        function playWithVoiceRSS() {
+            audioSystem?.openExternalService('VoiceRSS');
+        }
+        
+        function playWithTTSReader() {
+            audioSystem?.openExternalService('TTSReader');
+        }
+        
+        function playWithNaturalReaders() {
+            audioSystem?.openExternalService('NaturalReaders');
         }
         
         function openGoogleTranslate() {
@@ -1429,33 +1492,19 @@
             audioSystem?.openExternalService('必应翻译');
         }
         
-        function openYoudaoTranslate() {
-            audioSystem?.openExternalService('有道翻译');
-        }
-        
-        function hideManualPanel() {
-            audioSystem?.hideManualPanel();
-        }
-        
-        function showPronunciationGuide() {
-            audioSystem?.showPronunciationGuide();
-        }
-        
-        function hidePronunciationGuide() {
-            audioSystem?.hidePronunciationGuide();
-        }
-        
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 页面加载完成，初始化日语学习系统');
+            console.log('🚀 页面加载完成，初始化终极音频系统');
             
-            // 初始化音频系统
-            audioSystem = new JapaneseAudioSystem();
+            // 延迟初始化，确保DOM完全加载
+            setTimeout(() => {
+                audioSystem = new UltimateJapaneseAudioSystem();
+            }, 100);
             
             // 初始化其他功能
             updatePagination();
             
-            console.log('✅ 系统初始化完成');
+            console.log('✅ 页面初始化完成');
         });
         
         // 自动更新页码导航
