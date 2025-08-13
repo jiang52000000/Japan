@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标准日语 初级上册 - 课程目录</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Sans+SC&display=swap" rel="stylesheet">
+    <style>
+        .course-list {
+            margin: 30px 0;
+        }
+        
+        .course-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .course-header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px 20px;
+        }
+        
+        .course-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+        
+        .course-header p {
+            margin: 5px 0 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .course-body {
+            padding: 20px;
+        }
+        
+        .course-description {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .btn-primary {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c0392b;
+        }
+        
+        .loading-indicator {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #777;
+        }
+        
+        .no-lessons-found {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            margin: 30px 0;
+            border: 1px dashed #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>标准日语 初级上册</h1>
+            <h2>课程目录</h2>
+            <p>点击下方课程卡片进入相应的课程学习</p>
+        </header>
+
+        <div id="courseList" class="course-list">
+            <!-- 直接显示课程列表，不依赖AJAX检测 -->
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseList = document.getElementById('courseList');
+            
+            // 课程信息，会自动扩展
+            // 格式：[文件名, 课程标题, 课程副标题, 简短描述]
+            const courseData = [
+                ['lesson1.html', '第一课', 'はじめまして', '学习初次见面时的自我介绍和简单对话'],
+                ['lesson2.html', '第二课', 'これは本です', '学习指示代词和简单的判断句'],
+                ['lesson3.html', '第三课', 'ここはどこですか', '学习地点表达和存在句'],
+                ['lesson4.html', '第四课', '今何時ですか', '学习时间表达和日常活动'],
+                ['lesson5.html', '第五课', '森さんは７時に起きます', '学习日常生活作息的表达'],
+                ['lesson6.html', '第六课', '吉田さんは来月中国へ行きます', '学习交通方式和目的地表达'],
+                ['lesson7.html', '第七课', '李さんは毎日コーヒーを飲みます', '学习日常饮食习惯和喜好表达'],
+                ['lesson8.html', '第八课', '京都へ行ったことがあります', '学习经验表达和过去时态'],
+                ['lesson9.html', '第九课', 'この電車は大阪に行きますか', '学习交通询问和比较表达'],
+                ['lesson10.html', '第十课', '日本語の授業は楽しいです', '学习原因理由和愿望表达'],
+                ['lesson11.html', '第十一课', '私は漢字が書けます', '学习能力表达和目的表达'],
+                ['lesson12.html', '第十二课', '友達にプレゼントをあげます', '学习授受表达和让步条件'],
+                ['lesson13.html', '第十三课', '部屋を片付けなければなりません', '学习义务禁止和许可表达'],
+                ['lesson14.html', '第十四课', 'このコンピューターは使い方が簡単です', '学习列举和条件表达'],
+                ['lesson15.html', '第十五课', '日本料理は魚や野菜などを使います', '学习列举和尝试表达'],
+                ['lesson16.html', '第十六课', '将来、日本の会社で働きたいです', '学习目的和手段表达'],
+                ['lesson17.html', '第十七课', '京都を訪れるのが楽しみです', '学习期待和样态表达'],
+                ['lesson18.html', '第十八课', '風邪をひいたので、病院へ行きました', '学习条件和推测表达'],
+                ['lesson19.html', '第十九课', '祭りに行くときは、浴衣を着ることができます', '学习可能和列举表达'],
+                ['lesson20.html', '第二十课', 'お土産を渡すときは、両手で渡します', '学习场合和许可表达'],
+                ['lesson21.html', '第二十一课', '地下鉄で行くより、バスで行ったほうが安いです', '学习比较和建议表达'],
+                ['lesson22.html', '第二十二课', 'この漫画は中国語に翻訳されています', '学习被动态和同时动作表达'],
+                ['lesson23.html', '第二十三课', '日本の家は玄関に靴を脱いでから入ります', '学习先后顺序和目的表达'],
+                ['lesson24.html', '第二十四课', '会議が始まる前に資料を配っておきます', '学习提前准备和期限表达']
+            ];
+            
+            // 清除加载指示器
+            courseList.innerHTML = '';
+            
+            // 直接显示所有课程
+            courseData.forEach(courseInfo => {
+                const [filename, title, subtitle, description] = courseInfo;
+                
+                const courseCard = document.createElement('div');
+                courseCard.className = 'course-card';
+                courseCard.innerHTML = `
+                    <div class="course-header">
+                        <h3>${title}</h3>
+                        <p>${subtitle}</p>
+                    </div>
+                    <div class="course-body">
+                        <p class="course-description">${description}</p>
+                        <a href="${filename}" class="btn-primary">进入学习</a>
+                    </div>
+                `;
+                
+                courseList.appendChild(courseCard);
+            });
+
+            // 添加下册入口
+            const lowerLevelElement = document.createElement('div');
+            lowerLevelElement.className = 'level-navigation';
+            lowerLevelElement.innerHTML = `
+                <a href="lower/index.html" class="next-level">
+                    <h3>标准日语 初级下册</h3>
+                    <p>点击进入下一阶段学习</p>
+                </a>
+            `;
+            document.querySelector('.container').appendChild(lowerLevelElement);
+
+            // 添加样式
+            const style = document.createElement('style');
+            style.textContent = `
+                .level-navigation {
+                    margin-top: 30px;
+                    padding: 20px;
+                    text-align: center;
+                }
+                .next-level {
+                    display: block;
+                    padding: 15px;
+                    background-color: #f5f5f5;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    color: #333;
+                    transition: background-color 0.2s;
+                    border: 1px solid #ddd;
+                }
+                .next-level:hover {
+                    background-color: #e5e5e5;
+                }
+                .next-level h3 {
+                    margin: 0 0 10px 0;
+                    color: #333;
+                }
+                .next-level p {
+                    margin: 0;
+                    color: #666;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

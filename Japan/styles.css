@@ -1,0 +1,514 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f9f7f2;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e74c3c;
+}
+
+header h1 {
+    color: #e74c3c;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+header h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+header h3 {
+    font-size: 1.5rem;
+    color: #666;
+}
+
+section {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+section h3 {
+    color: #e74c3c;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Dialogue styling */
+.dialogue-container {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.dialogue-line {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.speaker {
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 50px;
+}
+
+.speech {
+    flex: 1;
+}
+
+.japanese {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.japanese:hover {
+    color: #e74c3c;
+}
+
+.romaji {
+    color: #666;
+    font-style: italic;
+    margin: 3px 0 5px 0;
+    font-family: 'Noto Sans', sans-serif;
+}
+
+.chinese {
+    color: #333;
+}
+
+/* Vocabulary styling */
+.vocabulary table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vocabulary th, .vocabulary td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.vocabulary th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.vocabulary tr:hover {
+    background-color: #f5f5f5;
+}
+
+.word-text {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.word-text:hover {
+    color: #e74c3c;
+}
+
+/* 单词表假名单元格样式 */
+.kana-cell {
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.kana-cell:hover {
+    background-color: #f0f0f0;
+}
+
+.kana-cell:after {
+    content: "🔊";
+    font-size: 0.8em;
+    opacity: 0;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.2s;
+}
+
+.kana-cell:hover:after {
+    opacity: 0.5;
+}
+
+.kana-cell.playing {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+/* Example sentences */
+.example {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-left: 4px solid #e74c3c;
+    border-radius: 0 4px 4px 0;
+    transition: background-color 0.3s;
+}
+
+.example:hover {
+    background-color: #f0f0f0;
+}
+
+/* 添加假名样式 */
+.kana {
+    color: #707070;
+    font-size: 0.9em;
+    margin: 3px 0;
+}
+
+/* Grammar points */
+.grammar-point {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+.grammar-point h4 {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 4px solid #e74c3c;
+}
+
+.speech-text {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.speech-text:after {
+    content: "🔊";
+    font-size: 0.8em;
+    opacity: 0;
+    margin-left: 5px;
+    transition: opacity 0.2s;
+}
+
+.speech-text:hover:after {
+    opacity: 1;
+}
+
+/* 添加播放音频时的视觉反馈效果 */
+.playing {
+    color: #e74c3c;
+    text-shadow: 0 0 2px rgba(231, 76, 60, 0.6);
+    background-color: rgba(231, 76, 60, 0.1);
+    border-radius: 3px;
+    padding: 0 3px;
+    transition: all 0.3s ease;
+}
+
+/* 在可点击文本上显示更明显的播放图标 */
+.speech-text:after, .word-text:after {
+    content: "🔊";
+    font-size: 0.8em;
+    opacity: 0.3;
+    margin-left: 5px;
+    vertical-align: middle;
+    transition: opacity 0.2s;
+}
+
+.speech-text:hover:after, .word-text:hover:after {
+    opacity: 1;
+}
+
+/* 为朗读添加指示器样式 */
+@keyframes speakingPulse {
+    0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+    70% { box-shadow: 0 0 0 5px rgba(231, 76, 60, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+.playing {
+    animation: speakingPulse 1.5s infinite;
+}
+
+/* 添加以下样式来增强对话和场景描述的显示效果 */
+
+.scene-description {
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    margin-bottom: 15px;
+    background-color: #f5f5f5;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.scene-description-cn {
+    font-style: italic;
+    color: #777;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.note {
+    background-color: #e8f4f8;
+    padding: 10px;
+    border-left: 3px solid #4a90e2;
+    margin: 10px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+/* 添加导航样式 */
+.navigation {
+    margin-bottom: 30px;
+}
+
+.nav-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.nav-links a {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.nav-links a:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.nav-links a:active {
+    transform: translateY(0);
+}
+
+/* 考试真题部分样式 */
+.exam-practice {
+    margin-top: 40px;
+    padding: 25px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section-intro {
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.section-note {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+.exam-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.exam-section h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e74c3c;
+    display: inline-block;
+}
+
+.reading-passage {
+    background-color: #f5f5f5;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    line-height: 1.8;
+}
+
+.question {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    position: relative;
+}
+
+.question-number {
+    font-weight: bold;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.question-text {
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.options p {
+    margin-bottom: 8px;
+    padding: 5px;
+    transition: background-color 0.2s;
+}
+
+.options p:hover {
+    background-color: #f0f0f0;
+}
+
+.toggle-answer {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.toggle-answer:hover {
+    background-color: #3a7bc8;
+}
+
+.toggle-answer.active {
+    background-color: #e74c3c;
+}
+
+.answer-section {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #e8f4f8;
+    border-radius: 5px;
+    border-left: 4px solid #4a90e2;
+}
+
+.answer {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.explanation {
+    color: #555;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.listening-script {
+    padding: 10px;
+    background-color: #fff4e6;
+    border-left: 3px solid #fd7e14;
+    margin-bottom: 15px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.listening-script:hover {
+    background-color: #ffe8cc;
+}
+
+.listening-script:after {
+    content: "🔊";
+    margin-left: 5px;
+    font-size: 0.8em;
+}
+
+/* 课程导航样式 */
+.lesson-navigation {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+}
+
+.lesson-navigation a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.lesson-navigation a:hover {
+    background-color: #f5f5f5;
+    color: #e74c3c;
+}
+
+.lesson-navigation .nav-icon {
+    font-size: 1.2rem;
+    margin-right: 5px;
+}
+
+.nav-home {
+    margin-right: auto;
+}
+
+.nav-prev, .nav-next {
+    margin-left: 10px;
+}
+
+/* 课程分页样式 */
+.lesson-pagination {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.pagination-home, .pagination-prev, .pagination-next {
+    text-decoration: none;
+    color: #e74c3c;
+    padding: 8px 15px;
+    border: 1px solid #e74c3c;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-home:hover, .pagination-prev:hover, .pagination-next:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.pagination-current {
+    font-weight: bold;
+    color: #333;
+    padding: 8px 15px;
+}
