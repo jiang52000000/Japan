@@ -7,85 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Sans+SC&display=swap" rel="stylesheet">
     
-    <!-- ...existing styles... -->
-    
     <style>
-        /* 新增在线音频播放相关样式 */
-        .online-audio-container {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .audio-player-mini {
-            width: 0;
-            height: 0;
-            opacity: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-        
-        .tts-iframe {
-            width: 1px;
-            height: 1px;
-            border: none;
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-        }
-        
-        .backup-audio-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            z-index: 2000;
-            display: none;
-            backdrop-filter: blur(10px);
-        }
-        
-        .backup-audio-panel.show {
-            display: block;
-            animation: slideUp 0.3s ease;
-        }
-        
-        .backup-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin: 10px 0;
-        }
-        
-        .backup-option {
-            background: #007acc;
-            color: white;
-            border: none;
-            padding: 10px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        
-        .backup-option:hover {
-            background: #005c99;
-            transform: translateY(-1px);
-        }
-        
-        .backup-option:active {
-            transform: translateY(0);
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        /* 改进现有样式 */
         .audio-button {
             background: linear-gradient(145deg, #007acc, #005c99);
             color: white;
@@ -97,100 +19,21 @@
             font-size: 12px;
             vertical-align: middle;
             min-width: 35px;
-            position: relative;
             box-shadow: 0 2px 4px rgba(0,122,204,0.3);
             transition: all 0.2s ease;
         }
-        
         .audio-button:hover {
             background: linear-gradient(145deg, #005c99, #004d80);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,122,204,0.4);
         }
-        
         .audio-button.playing {
             background: linear-gradient(145deg, #28a745, #1e7e34);
-            animation: glow 1s infinite alternate;
         }
-        
-        .audio-button.loading {
-            background: linear-gradient(145deg, #ffc107, #e0a800);
-            animation: pulse 1s infinite;
-        }
-        
-        .audio-button.error {
-            background: linear-gradient(145deg, #dc3545, #c82333);
-        }
-        
-        .audio-button.success {
-            background: linear-gradient(145deg, #28a745, #1e7e34);
-        }
-        
-        .audio-test-panel {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: rgba(33,37,41,0.95);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 12px;
-            z-index: 1000;
-            max-width: 320px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            display: none;
-        }
-        .audio-test-panel.show {
-            display: block;
-            animation: slideIn 0.4s ease;
-        }
-        .test-panel-header {
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #4fc3f7;
-        }
-        .test-panel-item {
-            margin: 8px 0;
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+        .online-audio-container {
             display: inline-block;
-            margin-right: 6px;
         }
-        .status-indicator.online { background: #4caf50; }
-        .status-indicator.offline { background: #f44336; }
-        .status-indicator.loading { background: #ff9800; animation: pulse 1s infinite; }
-        
-        /* ...existing styles... */
     </style>
 </head>
 <body>
-    <!-- 音频测试面板 -->
-    <div id="audioTestPanel" class="audio-test-panel">
-        <div class="test-panel-header">🔊 音频系统状态</div>
-        <div class="test-panel-item">
-            <span>本地语音:</span>
-            <span id="localStatus"><span class="status-indicator loading"></span>检测中</span>
-        </div>
-        <div class="test-panel-item">
-            <span>在线TTS:</span>
-            <span id="onlineStatus"><span class="status-indicator loading"></span>检测中</span>
-        </div>
-        <div class="test-panel-item">
-            <span>推荐方案:</span>
-            <span id="recommendedMethod"><span class="status-indicator loading"></span>分析中</span>
-        </div>
-    </div>
-
     <div class="container">
         <header>
             <h1>标准日语 初级上册 Pro</h1>
@@ -824,768 +667,67 @@
         </div>
     </div>
     
-    <!-- 备用音频面板 -->
-    <div id="backupAudioPanel" class="backup-audio-panel">
-        <div style="text-align: center; margin-bottom: 10px;">
-            <strong>🎵 选择播放方式</strong>
-            <button onclick="hideBackupPanel()" style="float: right; background: transparent; border: none; color: white; cursor: pointer;">✕</button>
-        </div>
-        <div id="currentTextDisplay" style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center; font-weight: bold;"></div>
-        <div class="backup-options">
-            <button class="backup-option" onclick="playWithResponsiveVoice()">
-                🎤 ResponsiveVoice<br><small>高质量语音</small>
-            </button>
-            <button class="backup-option" onclick="playWithVoiceRSS()">
-                🔊 VoiceRSS<br><small>稳定可靠</small>
-            </button>
-            <button class="backup-option" onclick="playWithTTSReader()">
-                📢 TTSReader<br><small>免费服务</small>
-            </button>
-            <button class="backup-option" onclick="playWithNaturalReaders()">
-                🎵 NaturalReaders<br><small>自然发音</small>
-            </button>
-            <button class="backup-option" onclick="openGoogleTranslate()">
-                🌐 Google翻译<br><small>最准确</small>
-            </button>
-            <button class="backup-option" onclick="openBingTranslator()">
-                🔵 必应翻译<br><small>微软引擎</small>
-            </button>
-        </div>
-    </div>
-
-    <!-- 隐藏的音频加载区域 -->
-    <div id="audioLoadingArea" style="display: none;">
-        <iframe id="ttsIframe" class="tts-iframe"></iframe>
-    </div>
-    
     <script src="script.js"></script>
     <script>
-        // 🎵 终极日语音频系统 V7.0 - 完全兼容版
-        class UltimateJapaneseAudioSystem {
-            constructor() {
-                this.config = {
-                    speechSupported: false,
-                    japaneseVoice: null,
-                    currentMethod: 'auto',
-                    isInitialized: false,
-                    isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-                    isChrome: /Chrome/i.test(navigator.userAgent),
-                    isAndroid: /Android/i.test(navigator.userAgent),
-                    isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
-                    isSafari: /Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent)
-                };
-                
-                this.currentText = '';
-                this.currentButton = null;
-                this.audioCache = new Map();
-                this.statusCheckInterval = null;
-                
-                // 多重在线TTS服务
-                this.onlineProviders = [
-                    {
-                        name: 'Google TTS (直接)',
-                        url: (text) => `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(text)}&tl=ja`,
-                        priority: 1
-                    },
-                    {
-                        name: 'ResponsiveVoice',
-                        url: (text) => `https://code.responsivevoice.org/getvoice.php?t=${encodeURIComponent(text)}&tl=ja&sv=&vn=&pitch=0.5&rate=0.5&vol=1`,
-                        priority: 2
-                    },
-                    {
-                        name: 'VoiceRSS',
-                        url: (text) => `https://api.voicerss.org/?key=demo&hl=ja-jp&c=MP3&f=22khz_16bit_mono&src=${encodeURIComponent(text)}`,
-                        priority: 3
-                    }
-                ];
-                
-                this.externalServices = [
-                    {
-                        name: 'Google翻译',
-                        url: (text) => `https://translate.google.com/?sl=ja&tl=zh&text=${encodeURIComponent(text)}&op=translate`,
-                        icon: '🌐',
-                        description: '最准确的日语发音'
-                    },
-                    {
-                        name: '必应翻译',
-                        url: (text) => `https://www.bing.com/translator/?text=${encodeURIComponent(text)}&from=ja&to=zh-Hans`,
-                        icon: '🔊',
-                        description: '微软语音引擎'
-                    },
-                    {
-                        name: '有道翻译',
-                        url: (text) => `https://fanyi.youdao.com/#/ja/zh/${encodeURIComponent(text)}`,
-                        icon: '📱',
-                        description: '国内稳定访问'
-                    }
-                ];
-                
-                this.init();
-            }
-            
-            async init() {
-                console.log('🚀 初始化终极日语音频系统 V7.0');
-                console.log(`📱 设备信息: ${this.config.isMobile ? '移动设备' : '桌面设备'}`);
-                console.log(`🌐 浏览器: ${this.getBrowserInfo()}`);
-                
-                // 显示状态面板
-                this.showStatusPanel();
-                
-                // 初始化本地语音
-                await this.initLocalSpeech();
-                
-                // 测试在线服务
-                await this.testOnlineServices();
-                
-                // 绑定事件
-                this.bindEvents();
-                
-                // 更新推荐方案
-                this.updateRecommendedMethod();
-                
-                // 启动状态监控
-                this.startStatusMonitoring();
-                
-                this.config.isInitialized = true;
-                console.log('✅ 音频系统初始化完成');
-                
-                // 5秒后自动隐藏状态面板
-                setTimeout(() => {
-                    this.hideStatusPanel();
-                }, 5000);
-            }
-            
-            getBrowserInfo() {
-                if (this.config.isChrome && this.config.isAndroid) return 'Android Chrome';
-                if (this.config.isSafari && this.config.isIOS) return 'iOS Safari';
-                if (this.config.isChrome) return 'Chrome';
-                if (this.config.isSafari) return 'Safari';
-                return '其他浏览器';
-            }
-            
-            showStatusPanel() {
-                const panel = document.getElementById('audioTestPanel');
-                if (panel) {
-                    panel.classList.add('show');
-                    this.updateLocalStatus('检测中...', 'loading');
-                    this.updateOnlineStatus('检测中...', 'loading');
-                    this.updateRecommendedStatus('分析中...', 'loading');
-                }
-            }
-            
-            hideStatusPanel() {
-                const panel = document.getElementById('audioTestPanel');
-                if (panel) {
-                    panel.classList.remove('show');
-                }
-            }
-            
-            async initLocalSpeech() {
-                console.log('🔍 检测本地语音支持...');
-                
-                if (!('speechSynthesis' in window)) {
-                    console.log('❌ 本地语音API不支持');
-                    this.updateLocalStatus('不支持', 'offline');
-                    return false;
-                }
-                
-                this.config.speechSupported = true;
-                this.updateLocalStatus('加载中...', 'loading');
-                
-                return new Promise((resolve) => {
-                    const loadVoices = () => {
-                        const voices = speechSynthesis.getVoices();
-                        console.log(`🔍 检测到 ${voices.length} 个语音`);
-                        
-                        if (voices.length === 0) {
-                            this.updateLocalStatus('无语音', 'offline');
-                            resolve(false);
-                            return;
-                        }
-                        
-                        // 查找日语语音
-                        const japaneseVoices = voices.filter(voice => {
-                            const lang = voice.lang?.toLowerCase() || '';
-                            const name = voice.name?.toLowerCase() || '';
-                            return lang.includes('ja') || 
-                                   name.includes('japanese') || 
-                                   name.includes('kyoko') || 
-                                   name.includes('otoya');
-                        });
-                        
-                        if (japaneseVoices.length > 0) {
-                            this.config.japaneseVoice = japaneseVoices[0];
-                            console.log(`✅ 找到日语语音: ${this.config.japaneseVoice.name}`);
-                            this.updateLocalStatus(`可用 (${this.config.japaneseVoice.name.substring(0, 8)})`, 'online');
-                            resolve(true);
-                        } else if (voices.length > 0) {
-                            this.config.japaneseVoice = voices[0];
-                            console.log(`⚠️ 使用默认语音: ${this.config.japaneseVoice.name}`);
-                            this.updateLocalStatus(`默认语音`, 'online');
-                            resolve(true);
-                        } else {
-                            this.updateLocalStatus('无可用语音', 'offline');
-                            resolve(false);
-                        }
-                    };
-                    
-                    if (speechSynthesis.getVoices().length === 0) {
-                        speechSynthesis.addEventListener('voiceschanged', loadVoices, { once: true });
-                        // 超时处理
-                        setTimeout(() => {
-                            if (speechSynthesis.getVoices().length === 0) {
-                                console.log('⏰ 语音加载超时');
-                                this.updateLocalStatus('加载超时', 'offline');
-                                resolve(false);
-                            }
-                        }, 3000);
-                    } else {
-                        loadVoices();
-                    }
-                });
-            }
-            
-            async testOnlineServices() {
-                console.log('🌐 测试在线服务...');
-                this.updateOnlineStatus('测试中...', 'loading');
-                
-                try {
-                    // 简单的网络连接测试
-                    const testPromise = fetch('https://www.google.com/favicon.ico', { 
-                        method: 'HEAD', 
-                        mode: 'no-cors',
-                        cache: 'no-cache'
-                    });
-                    
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('timeout')), 3000)
-                    );
-                    
-                    await Promise.race([testPromise, timeoutPromise]);
-                    
-                    console.log('✅ 网络连接正常');
-                    this.updateOnlineStatus('可用', 'online');
-                    return true;
-                } catch (error) {
-                    console.log('❌ 网络连接异常:', error.message);
-                    this.updateOnlineStatus('网络异常', 'offline');
-                    return false;
-                }
-            }
-            
-            updateRecommendedMethod() {
-                let method = '手动播放';
-                let status = 'offline';
-                
-                if (this.config.speechSupported && this.config.japaneseVoice) {
-                    if (this.config.isAndroid || this.config.isIOS) {
-                        method = '混合模式';
-                        status = 'online';
-                    } else {
-                        method = '本地语音';
-                        status = 'online';
-                    }
-                } else {
-                    method = '在线服务';
-                    status = 'loading';
-                }
-                
-                this.updateRecommendedStatus(method, status);
-            }
-            
-            bindEvents() {
-                // 绑定音频按钮
-                document.querySelectorAll('.audio-button').forEach(button => {
-                    const text = button.getAttribute('data-text') || 
-                               button.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-                    
-                    if (text) {
-                        // 移除旧的onclick
-                        button.removeAttribute('onclick');
-                        
-                        // 添加新的事件监听器
-                        button.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            this.playAudio(text, button);
-                        });
-                    }
-                });
-                
-                // 用户交互激活
-                document.addEventListener('click', this.activateAudioContext.bind(this), { once: true });
-                document.addEventListener('touchstart', this.activateAudioContext.bind(this), { once: true });
-            }
-            
-            activateAudioContext() {
-                if (this.config.speechSupported) {
-                    try {
-                        const testUtterance = new SpeechSynthesisUtterance('');
-                        testUtterance.volume = 0;
-                        speechSynthesis.speak(testUtterance);
-                        console.log('🎵 音频上下文已激活');
-                    } catch (e) {
-                        console.log('音频上下文激活跳过');
-                    }
-                }
-            }
-            
-            async playAudio(text, button) {
-                console.log(`🎵 播放请求: "${text}"`);
-                this.currentText = text;
-                this.currentButton = button;
-                
-                // 重置按钮状态
-                this.resetAllButtons();
-                if (button) {
-                    button.classList.add('loading');
-                    button.textContent = '⏳';
-                }
-                
-                // 选择播放策略
-                const method = document.getElementById('audioMethod')?.value || 'auto';
-                
-                switch (method) {
-                    case 'local':
-                        await this.playLocalAudio(text, button);
-                        break;
-                    case 'online':
-                        await this.playOnlineAudio(text, button);
-                        break;
-                    case 'manual':
-                        this.showBackupOptions(text, button);
-                        break;
-                    case 'guide':
-                        this.showPronunciationGuide(text, button);
-                        break;
-                    case 'auto':
-                    default:
-                        await this.playAutoAudio(text, button);
-                        break;
-                }
-            }
-            
-            async playAutoAudio(text, button) {
-                console.log('🤖 智能播放模式');
-                
-                // 移动设备优先策略
-                if (this.config.isMobile) {
-                    // 先尝试在线服务
-                    const onlineSuccess = await this.playOnlineAudio(text, button);
-                    if (!onlineSuccess) {
-                        // 再尝试本地语音
-                        const localSuccess = await this.playLocalAudio(text, button);
-                        if (!localSuccess) {
-                            // 显示备用选项
-                            this.showBackupOptions(text, button);
-                        }
-                    }
-                } else {
-                    // 桌面设备优先本地语音
-                    const localSuccess = await this.playLocalAudio(text, button);
-                    if (!localSuccess) {
-                        const onlineSuccess = await this.playOnlineAudio(text, button);
-                        if (!onlineSuccess) {
-                            this.showBackupOptions(text, button);
-                        }
-                    }
-                }
-            }
-            
-            async playLocalAudio(text, button) {
-                if (!this.config.speechSupported || !this.config.japaneseVoice) {
-                    console.log('❌ 本地语音不可用');
-                    return false;
-                }
-                
-                return new Promise((resolve) => {
-                    try {
-                        speechSynthesis.cancel();
-                        
-                        const utterance = new SpeechSynthesisUtterance(text);
-                        utterance.voice = this.config.japaneseVoice;
-                        utterance.lang = 'ja-JP';
-                        utterance.rate = parseFloat(document.getElementById('speechRate')?.value || 0.8);
-                        utterance.pitch = 1.0;
-                        utterance.volume = 1.0;
-                        
-                        utterance.onstart = () => {
-                            console.log('▶️ 本地播放开始');
-                            if (button) {
-                                button.classList.remove('loading');
-                                button.classList.add('playing');
-                                button.textContent = '▶️';
-                            }
-                        };
-                        
-                        utterance.onend = () => {
-                            console.log('⏹️ 本地播放结束');
-                            this.resetButton(button);
-                            resolve(true);
-                        };
-                        
-                        utterance.onerror = (event) => {
-                            console.error(`❌ 本地播放错误: ${event.error}`);
-                            this.resetButton(button);
-                            resolve(false);
-                        };
-                        
-                        speechSynthesis.speak(utterance);
-                        
-                    } catch (error) {
-                        console.error('❌ 本地播放异常:', error);
-                        this.resetButton(button);
-                        resolve(false);
-                    }
-                });
-            }
-            
-            async playOnlineAudio(text, button) {
-                console.log('🌐 尝试在线播放');
-                
-                // 尝试多个在线服务
-                for (const provider of this.onlineProviders) {
-                    try {
-                        console.log(`尝试 ${provider.name}...`);
-                        const success = await this.tryProvider(provider, text, button);
-                        if (success) {
-                            console.log(`✅ ${provider.name} 播放成功`);
-                            return true;
-                        }
-                    } catch (error) {
-                        console.log(`❌ ${provider.name} 失败:`, error);
-                    }
-                }
-                
-                console.log('❌ 所有在线服务都失败');
-                return false;
-            }
-            
-            async tryProvider(provider, text, button) {
-                return new Promise((resolve) => {
-                    try {
-                        const audioUrl = provider.url(text);
-                        const audio = new Audio();
-                        
-                        // 设置超时
-                        const timeout = setTimeout(() => {
-                            resolve(false);
-                        }, 5000);
-                        
-                        audio.oncanplaythrough = () => {
-                            clearTimeout(timeout);
-                            if (button) {
-                                button.classList.remove('loading');
-                                button.classList.add('playing');
-                                button.textContent = '▶️';
-                            }
-                            
-                            audio.play()
-                                .then(() => resolve(true))
-                                .catch(() => resolve(false));
-                        };
-                        
-                        audio.onended = () => {
-                            this.resetButton(button);
-                        };
-                        
-                        audio.onerror = () => {
-                            clearTimeout(timeout);
-                            resolve(false);
-                        };
-                        
-                        // 尝试加载音频
-                        audio.crossOrigin = 'anonymous';
-                        audio.src = audioUrl;
-                        audio.load();
-                        
-                    } catch (error) {
-                        resolve(false);
-                    }
-                });
-            }
-            
-            showBackupOptions(text, button) {
-                console.log('📋 显示备用选项');
-                this.currentText = text;
-                
-                if (button) {
-                    button.classList.remove('loading');
-                    button.classList.add('error');
-                    button.textContent = '🔗';
-                }
-                
-                const panel = document.getElementById('backupAudioPanel');
-                const textDisplay = document.getElementById('currentTextDisplay');
-                
-                if (panel && textDisplay) {
-                    textDisplay.textContent = `日语: ${text}`;
-                    panel.classList.add('show');
-                }
-            }
-            
-            // 状态更新方法
-            updateLocalStatus(message, type) {
-                const statusEl = document.getElementById('localStatus');
-                if (statusEl) {
-                    statusEl.innerHTML = `<span class="status-indicator ${type}"></span>${message}`;
-                }
-            }
-            
-            updateOnlineStatus(message, type) {
-                const statusEl = document.getElementById('onlineStatus');
-                if (statusEl) {
-                    statusEl.innerHTML = `<span class="status-indicator ${type}"></span>${message}`;
-                }
-            }
-            
-            updateRecommendedStatus(message, type) {
-                const statusEl = document.getElementById('recommendedMethod');
-                if (statusEl) {
-                    statusEl.innerHTML = `<span class="status-indicator ${type}"></span>${message}`;
-                }
-            }
-            
-            updateMainStatus(message, type = 'loading') {
-                const statusEl = document.getElementById('currentAudioStatus');
-                if (statusEl) {
-                    statusEl.textContent = message;
-                    statusEl.className = `audio-status ${type}`;
-                }
-            }
-            
-            // 按钮控制
-            resetButton(button) {
-                if (button) {
-                    button.classList.remove('loading', 'playing', 'error', 'success');
-                    button.textContent = '🔊';
-                }
-            }
-            
-            resetAllButtons() {
-                document.querySelectorAll('.audio-button').forEach(button => {
-                    this.resetButton(button);
-                });
-            }
-            
-            // 状态监控
-            startStatusMonitoring() {
-                // 每5秒检查一次状态
-                this.statusCheckInterval = setInterval(() => {
-                    this.updateMainStatus(this.getOverallStatus(), this.getOverallStatusType());
-                }, 5000);
-            }
-            
-            getOverallStatus() {
-                if (this.config.speechSupported && this.config.japaneseVoice) {
-                    return '音频系统就绪 - 多重播放方案可用';
-                } else {
-                    return '仅支持在线播放和外部链接';
-                }
-            }
-            
-            getOverallStatusType() {
-                if (this.config.speechSupported && this.config.japaneseVoice) {
-                    return 'online';
-                } else {
-                    return 'loading';
-                }
-            }
-            
-            // 外部方法
-            openExternalService(serviceName) {
-                const service = this.externalServices.find(s => s.name === serviceName);
-                if (service && this.currentText) {
-                    const url = service.url(this.currentText);
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                    console.log(`🔗 打开外部服务: ${serviceName}`);
-                    this.hideBackupPanel();
-                }
-            }
-            
-            hideBackupPanel() {
-                const panel = document.getElementById('backupAudioPanel');
-                if (panel) {
-                    panel.classList.remove('show');
-                }
-            }
-            
-            showPronunciationGuide(text, button) {
-                // 显示发音指导的逻辑
-                console.log(`📖 显示发音指导: ${text}`);
-                if (button) {
-                    button.classList.remove('loading');
-                    button.classList.add('success');
-                    button.textContent = '📖';
-                }
-                // 这里可以添加显示发音指导面板的代码
-            }
-        }
-        
-        // 全局实例
-        let audioSystem;
-        
-        // 全局函数
-        function testAudioSystem() {
-            console.log('🧪 手动测试音频系统');
-            if (audioSystem) {
-                audioSystem.showStatusPanel();
-                setTimeout(() => {
-                    audioSystem.playAudio('テスト', null);
-                }, 1000);
-            }
-        }
-        
-        function showAudioHelp() {
-            const helpText = `🎵 终极日语音频系统 V7.0
-
-🚀 系统特性:
-• 智能设备检测和适配
-• 多重在线TTS服务
-• 完善的备用方案
-• 实时状态监控
-
-📱 设备兼容性:
-• Android Chrome: ✅ 完美支持
-• iOS Safari: ✅ 完美支持
-• 桌面浏览器: ✅ 完美支持
-
-🔧 播放方式:
-• 智能选择: 自动选择最佳方案
-• 本地语音: 设备内置TTS
-• 在线语音: 多个TTS服务
-• 手动播放: 外部翻译网站
-• 发音指导: 详细发音说明
-
-💡 使用建议:
-1. 首次使用建议点击"测试音频"
-2. 如遇问题可切换播放方式
-3. 移动设备建议连接WiFi`;
-        
-            alert(helpText);
-        }
-        
-        function hideBackupPanel() {
-            audioSystem?.hideBackupPanel();
-        }
-        
-        function playWithResponsiveVoice() {
-            audioSystem?.openExternalService('ResponsiveVoice');
-        }
-        
-        function playWithVoiceRSS() {
-            audioSystem?.openExternalService('VoiceRSS');
-        }
-        
-        function playWithTTSReader() {
-            audioSystem?.openExternalService('TTSReader');
-        }
-        
-        function playWithNaturalReaders() {
-            audioSystem?.openExternalService('NaturalReaders');
-        }
-        
-        function openGoogleTranslate() {
-            audioSystem?.openExternalService('Google翻译');
-        }
-        
-        function openBingTranslator() {
-            audioSystem?.openExternalService('必应翻译');
-        }
-        
-        // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 页面加载完成，初始化终极音频系统');
-            
-            // 延迟初始化，确保DOM完全加载
-            setTimeout(() => {
-                audioSystem = new UltimateJapaneseAudioSystem();
-            }, 100);
-            
-            // 初始化其他功能
             updatePagination();
-            
-            console.log('✅ 页面初始化完成');
         });
-        
-        // 自动更新页码导航
+
         function updatePagination() {
-            // 获取当前页面文件名
             const currentPath = window.location.pathname;
             const currentPage = currentPath.substring(currentPath.lastIndexOf('/') + 1);
-            
-            // 提取当前课程编号
             const currentLessonMatch = currentPage.match(/lesson(\d+)\.html/);
             if (!currentLessonMatch) return;
-            
             const currentLessonNum = parseInt(currentLessonMatch[1]);
             const prevLessonNum = currentLessonNum - 1;
             const nextLessonNum = currentLessonNum + 1;
-            
-            // 更新导航链接
             const prevLink = document.querySelector('.nav-prev');
             const nextLink = document.querySelector('.nav-next');
             const paginationPrev = document.querySelector('.pagination-prev');
             const paginationNext = document.querySelector('.pagination-next');
             const paginationCurrent = document.querySelector('.pagination-current');
-            
-            // 检查前一课是否存在
             if (prevLessonNum >= 1) {
-                const prevUrl = `lesson${prevLessonNum}.html`;
+                const prevUrl = 'lesson' + prevLessonNum + '.html';
                 prevLink.href = prevUrl;
                 prevLink.style.visibility = 'visible';
-                
                 paginationPrev.href = prevUrl;
-                paginationPrev.textContent = `« 第${toChineseNumber(prevLessonNum)}课`;
+                paginationPrev.textContent = '« 第' + toChineseNumber(prevLessonNum) + '课';
                 paginationPrev.style.visibility = 'visible';
             } else {
                 prevLink.style.visibility = 'hidden';
                 paginationPrev.style.visibility = 'hidden';
             }
-            
-            // 总是更新当前课程编号
-            paginationCurrent.textContent = `第${toChineseNumber(currentLessonNum)}课`;
-            
-            // 从当前DOM中检测已知的课程链接
+            paginationCurrent.textContent = '第' + toChineseNumber(currentLessonNum) + '课';
             const courseLinks = detectExistingCourseLinks();
-            const maxLessons = Math.max(...courseLinks, 6); // 至少支持6课
-            
+            const maxLessons = Math.max(...courseLinks, 24);
             if (nextLessonNum <= maxLessons) {
-                const nextUrl = `lesson${nextLessonNum}.html`;
+                const nextUrl = 'lesson' + nextLessonNum + '.html';
                 nextLink.href = nextUrl;
                 nextLink.style.visibility = 'visible';
-                
                 paginationNext.href = nextUrl;
-                paginationNext.textContent = `第${toChineseNumber(nextLessonNum)}课 »`;
+                paginationNext.textContent = '第' + toChineseNumber(nextLessonNum) + '课 »';
                 paginationNext.style.visibility = 'visible';
             } else {
                 nextLink.style.visibility = 'hidden';
                 paginationNext.style.visibility = 'hidden';
             }
         }
-        
-        // 从当前DOM中检测已知的课程链接
         function detectExistingCourseLinks() {
             const links = document.querySelectorAll('a[href^="lesson"]');
             const courseNumbers = [];
-            
             links.forEach(link => {
                 const match = link.getAttribute('href').match(/lesson(\d+)\.html/);
-                if (match && match[1]) {
-                    courseNumbers.push(parseInt(match[1]));
-                }
+                if (match && match[1]) courseNumbers.push(parseInt(match[1]));
             });
-            
-            return courseNumbers.length > 0 ? courseNumbers : [6]; // 默认至少6课
+            return courseNumbers.length > 0 ? courseNumbers : [24];
         }
-        
         function toChineseNumber(num) {
-            // 简单的数字转中文数字，适用于课程编号
-            const chineseNumbers = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
-            if (num <= 10) return chineseNumbers[num];
-            if (num < 20) return '十' + (num > 10 ? chineseNumbers[num - 10] : '');
+            const cn = ['零','一','二','三','四','五','六','七','八','九','十'];
+            if (num <= 10) return cn[num];
+            if (num < 20) return '十' + (num > 10 ? cn[num - 10] : '');
             const tens = Math.floor(num / 10);
             const ones = num % 10;
-            return chineseNumbers[tens] + '十' + (ones > 0 ? chineseNumbers[ones] : '');
+            return cn[tens] + '十' + (ones > 0 ? cn[ones] : '');
         }
     </script>
 </body>
